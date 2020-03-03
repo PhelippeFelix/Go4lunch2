@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main_activity_coordinator_layout"
+    android:id="@+id/log_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -46,25 +46,47 @@
 
             <!-- BUTTON LOGIN -->
             <Button
-                android:id="@+id/main_activity_button_login"
+                android:id="@+id/button_mail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/login"
                 android:textColor="#fff"
                 android:textSize="@dimen/default_text_size"
                 android:background="@drawable/button_radius_primary_color"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_margin="@dimen/default_large_margin"
                 android:padding="@dimen/default_large_margin"/>
-
-            <!-- BUTTON CHAT -->
             <Button
-                android:id="@+id/main_activity_button_chat"
+                android:id="@+id/button_facebook"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/chat_with_mentor"
+                android:text="@string/login"
                 android:textColor="#fff"
                 android:textSize="@dimen/default_text_size"
-                android:background="@drawable/button_radius_accent_color"
+                android:background="@drawable/button_radius_primary_color"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_margin="@dimen/default_large_margin"
+                android:padding="@dimen/default_large_margin"/>
+            <Button
+                android:id="@+id/button_google"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login"
+                android:textColor="#fff"
+                android:textSize="@dimen/default_text_size"
+                android:background="@drawable/button_radius_primary_color"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_margin="@dimen/default_large_margin"
+                android:padding="@dimen/default_large_margin"/>
+            <Button
+                android:id="@+id/button_twitter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="?android:attr/borderlessButtonStyle"
+                android:text="@string/login"
+                android:textColor="#fff"
+                android:textSize="@dimen/default_text_size"
+                android:background="@drawable/button_radius_primary_color"
                 android:layout_margin="@dimen/default_large_margin"
                 android:padding="@dimen/default_large_margin"/>
 

@@ -18,6 +18,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Toolbar toolbar;
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.configureToolBar();
         this.configureDrawerLayout();
         this.configureNavigationView();
+        ButterKnife.bind(this);
     }
 
     // 1 - Configure Toolbar
