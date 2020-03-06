@@ -27,7 +27,7 @@ import cfwz.skiti.go4lunch.R;
  * Created by Skiti on 02/03/2020
  */
 
-public class logginActivity extends Activity {
+public class LogginActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +47,7 @@ public class logginActivity extends Activity {
     // ACTIONS
     // --------------------
 
-    @OnClick(R.id.button_mail)
+    @OnClick(R.id.button_log)
     public void onClickLoginButton() {
         this.startSignInActivity();
         System.out.println("sdffjnasidfbsdfuasfasdfasdfasdf");
@@ -65,7 +65,9 @@ public class logginActivity extends Activity {
                         .createSignInIntentBuilder()
                         .setTheme(R.style.LoginTheme)
                         .setAvailableProviders(Arrays.asList(
-                                new AuthUI.IdpConfig.EmailBuilder().build()))
+                                new AuthUI.IdpConfig.EmailBuilder().build(),
+                                new AuthUI.IdpConfig.FacebookBuilder().build(),
+                                new AuthUI.IdpConfig.GoogleBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
                         .setLogo(R.drawable.ic_logo_auth)
                         .build(),

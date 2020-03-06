@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Go4Lunch</string>
     <string name="title_map">Map View</string>
     <string name="title_list">List View</string>
@@ -7,6 +7,17 @@
     <string name="menu_lunch">YOUR LUNCH</string>
     <string name="menu_settings">SETTINGS</string>
     <string name="menu_logout">LOGOUT</string>
+
+    <string name="restaurant_name">Name Of The Restaurant</string>
+    <string name="restaurant_address">address of the restaurant</string>
+    <string name="call_option">CALL</string>
+    <string name="like_option">LIKE</string>
+    <string name="website_option">WEBSITE</string>
+    <string name="friend_restaurant">Scarlett is joining</string>
+
+    <!-- FACEBOOK PURPOSE -->
+    <string name="facebook_application_id" translatable="false">222821079119135</string>
+    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb222821079119135</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
