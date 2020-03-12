@@ -2,46 +2,138 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/object"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="70dp"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/item_list_avatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
-        android:id="@+id/item_list_name"
+        android:id="@+id/name_restaurant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_marginBottom="20dp"
-        android:textStyle="bold"
         android:text="SDFSDFFFFFFFFF"
         android:textColor="#000000"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="@+id/item_list_avatar"
-        app:layout_constraintStart_toEndOf="@+id/item_list_avatar"
-        app:layout_constraintTop_toTopOf="@+id/item_list_avatar" />
+        android:textSize="12dp"
+        android:textStyle="bold"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="13dp"
+        tools:layout_editor_absoluteY="4dp" />
+
     <TextView
-        android:id="@+id/item_list_emails"
+        android:id="@+id/adress_restaurant"
         android:layout_width="wrap_content"
-        android:layout_marginTop="20dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLength="40"
-        android:layout_marginLeft="24dp"
-        android:text="fbsdfjhsdfjhsbdfjshbdfjsbdfjhsbdfjhsbdfddgdfgdfgdfgdfgd"
+        android:text="adress sfnsnfisfisiofdo sfasdfs"
+        android:textSize="10dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/item_list_avatar"
-        app:layout_constraintStart_toEndOf="@+id/item_list_avatar"
-        app:layout_constraintTop_toTopOf="@+id/item_list_avatar" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="13dp"
+        tools:layout_editor_absoluteY="28dp" />
+
+    <TextView
+        android:id="@+id/adress_restaurant3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLength="40"
+        android:text="open until sdsadasdasdasd"
+        android:textSize="10dp"
+        android:textStyle="bold"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="13dp"
+        tools:layout_editor_absoluteY="50dp" />
+
+    <TextView
+        android:id="@+id/adress_restaurant2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLength="40"
+        android:text="2000m"
+        android:textSize="10dp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="278dp"
+        tools:layout_editor_absoluteY="4dp"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/star_restaurant"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginEnd="36dp"
+        android:ellipsize="end"
+        android:maxLength="40"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/item_avatar_restaurant"
+        app:layout_constraintLeft_toLeftOf="@id/object"
+        tools:layout_editor_absoluteY="48dp"
+        android:src="@drawable/ic_favorite_on_24dp"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/star_restaurant2"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginEnd="52dp"
+        android:ellipsize="end"
+        android:maxLength="40"
+        android:src="@drawable/ic_favorite_on_24dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/item_avatar_restaurant"
+        app:layout_constraintLeft_toLeftOf="@id/object"
+        tools:layout_editor_absoluteY="48dp"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/star_restaurant3"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginEnd="68dp"
+        android:ellipsize="end"
+        android:maxLength="40"
+        android:src="@drawable/ic_favorite_on_24dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/item_avatar_restaurant"
+        app:layout_constraintLeft_toLeftOf="@id/object"
+        tools:layout_editor_absoluteY="48dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/adress_restaurant5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginEnd="36dp"
+        android:ellipsize="end"
+        android:maxLength="40"
+        android:text="(0)"
+        android:textSize="10dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/item_avatar_restaurant"
+        app:layout_constraintLeft_toLeftOf="@id/object"
+        tools:layout_editor_absoluteY="30dp"
+        tools:ignore="MissingConstraints" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_perm_identity_black_24dp"
+        tools:layout_editor_absoluteX="272dp"
+        tools:layout_editor_absoluteY="23dp"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/item_avatar_restaurant"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/carte"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="346dp"
+        tools:layout_editor_absoluteY="5dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

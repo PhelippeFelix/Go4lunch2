@@ -50,7 +50,6 @@ public class LogginActivity extends Activity {
     @OnClick(R.id.button_log)
     public void onClickLoginButton() {
         this.startSignInActivity();
-        System.out.println("sdffjnasidfbsdfuasfasdfasdfasdf");
     }
 
 
