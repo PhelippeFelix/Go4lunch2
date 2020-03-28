@@ -1,13 +1,25 @@
 package cfwz.skiti.go4lunch;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -17,14 +29,24 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.viewpager.widget.ViewPager;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import cfwz.skiti.go4lunch.ui.loggin.LogginActivity;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Toolbar toolbar;
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
+     Toolbar toolbar;
+     DrawerLayout drawerLayout;
+     NavigationView navigationView;
+    private static final int SIGN_OUT_TASK = 10;
+    String key = "AIzaSyBm5KR0R5LIAKLlQZoiodV6rbQ61iClmL4";
+
+
+    ImageView imageProfileView;
+    TextView nameUser;
+    TextView emailUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +60,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.configureToolBar();
         this.configureDrawerLayout();
         this.configureNavigationView();
+        if (!isCurrentUserLogged()){startSignInActivity();}
+        this.updateUI();
         ButterKnife.bind(this);
     }
 
-    // 1 - Configure Toolbar
+    @Nullable
+    protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+
+    protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
+
+    // Start SignIn Activity
+
+    private void startSignInActivity (){
+        Intent intent = new Intent(this, LogginActivity.class);
+        startActivity(intent);
+    }
+
+    // 1 - Update UI when activity is creating
+    private void updateUI(){
+        if (isCurrentUserLogged()){
+
+            //Get picture URL from Firebase
+            if (this.getCurrentUser().getPhotoUrl() != null) {
+                Glide.with(this)
+                        .load(this.getCurrentUser().getPhotoUrl())
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(imageProfileView);
+            }
+
+            //Get email & username from Firebase
+            String email = TextUtils.isEmpty(this.getCurrentUser().getEmail()) ? getString(R.string.info_no_email_found) : this.getCurrentUser().getEmail();
+            String username = TextUtils.isEmpty(this.getCurrentUser().getDisplayName()) ? getString(R.string.info_no_username_found) : this.getCurrentUser().getDisplayName();
+
+            //Update views with data
+            this.nameUser.setText(username);
+            this.emailUser.setText(email);
+        }
+    }
+
+    //  Configure Toolbar
     private void configureToolBar(){
         this.toolbar = findViewById(R.id.activity_main_toolbar);
         setSupportActionBar(toolbar);
     }
 
-    // 2 - Configure Drawer Layout
+    //  Configure Drawer Layout
     private void configureDrawerLayout() {
         this.drawerLayout = findViewById(R.id.main_drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -55,9 +113,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
     }
 
-    // 3 - Configure NavigationView
+    @Override
+    protected void onResume() {
+        this.updateUI();
+        super.onResume();
+    }
+
+    //  Configure NavigationView
     private void configureNavigationView() {
         this.navigationView = findViewById(R.id.activity_main_nav_view);
+        final View headerLayout = navigationView.getHeaderView(0);
+        imageProfileView = (ImageView) headerLayout.findViewById(R.id.imageProfileView);
+        emailUser = (TextView) headerLayout.findViewById(R.id.emailUser);
+        nameUser = (TextView) headerLayout.findViewById(R.id.nameUser);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -69,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        // 5 - Handle back click to close menu
+        //  Handle back click to close menu
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
@@ -81,21 +149,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
-        // 4 - Handle Navigation Item Click
+        //  Handle Navigation Item Click
         int id = item.getItemId();
-
         switch (id) {
             case R.id.nav_lunch:
                 break;
             case R.id.nav_settings:
                 break;
             case R.id.nav_logout:
-                break;
+                this.signOutUserFromFirebase();
             default:
                 break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
-
         return true;
+    }
+    // --------------------
+    // REST REQUESTS
+    // --------------------
+    // 1 - Create http requests (SignOut & Delete)
+
+    private void signOutUserFromFirebase(){
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+    }
+    // 3 - Create OnCompleteListener called after tasks ended
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
+        return new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                switch (origin){
+                    case SIGN_OUT_TASK:
+                        startSignInActivity();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 }

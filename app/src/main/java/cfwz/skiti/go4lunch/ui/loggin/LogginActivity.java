@@ -99,7 +99,7 @@ public class LogginActivity extends Activity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
-                showSnackBar(this.coordinatorLayout, getString(R.string.connection_succeed));
+                this.finish();
             } else { // ERRORS
                 if (response == null) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
