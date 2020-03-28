@@ -1,5 +1,7 @@
 package cfwz.skiti.go4lunch.model;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 
 /**
@@ -7,43 +9,32 @@ import java.util.ArrayList;
  */
 
 public class Workmate {
+    @Nullable String urlPicture;
     private String name;
     private String restaurant;
     private ArrayList<String>favorite = new ArrayList<>();
 
-    public Workmate(String name) {
+    public Workmate() {}
+
+    public Workmate(@Nullable String urlPicture, String name, String restaurant, ArrayList<String> favorite) {
+        this.urlPicture = urlPicture;
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRestaurant() {
-        return restaurant;
-    }
-
-    public void setRestaurant(String restaurant) {
         this.restaurant = restaurant;
-    }
-
-    public ArrayList<String> getFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(ArrayList<String> favorite) {
         this.favorite = favorite;
     }
 
-    public void Favorite(Workmate workmate,Restaurant restaurant){
-        if (workmate.getFavorite().contains(restaurant.getPlaceId())){
-            workmate.getFavorite().remove((restaurant.getPlaceId()));
-        }else{
-            workmate.getFavorite().add(restaurant.getPlaceId());
-        }
-    }
+
+    //GETTER
+    @Nullable
+    public String getUrlPicture() { return urlPicture; }
+    public String getName() { return name; }
+    public String getRestaurant() { return restaurant; }
+    public ArrayList<String> getFavorite() { return favorite; }
+
+
+    //SETTER
+    public void setUrlPicture(@Nullable String urlPicture) { this.urlPicture = urlPicture; }
+    public void setName(String name) { this.name = name; }
+    public void setRestaurant(String restaurant) { this.restaurant = restaurant; }
+    public void setFavorite(ArrayList<String> favorite) { this.favorite = favorite; }
 }
