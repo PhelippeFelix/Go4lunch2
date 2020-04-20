@@ -1,4 +1,4 @@
-package cfwz.skiti.go4lunch.model;
+package cfwz.skiti.go4lunch.models;
 
 /**
  * Created by Skiti on 23/03/2020

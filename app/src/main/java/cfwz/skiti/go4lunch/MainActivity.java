@@ -8,10 +8,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      DrawerLayout drawerLayout;
      NavigationView navigationView;
     private static final int SIGN_OUT_TASK = 10;
+    private static final int UPDATE_USERNAME = 30;
     String key = "AIzaSyBm5KR0R5LIAKLlQZoiodV6rbQ61iClmL4";
 
 
@@ -65,8 +68,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ButterKnife.bind(this);
     }
 
+
+
+    protected OnFailureListener onFailureListener(){
+        return new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
+            }
+        };
+    }
+
     @Nullable
-    protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+    public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 
     protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
 

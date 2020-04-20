@@ -3,9 +3,11 @@ package cfwz.skiti.go4lunch.ui.loggin;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -13,8 +15,14 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
+import java.lang.reflect.Array;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import butterknife.BindView;
@@ -22,6 +30,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cfwz.skiti.go4lunch.MainActivity;
 import cfwz.skiti.go4lunch.R;
+import cfwz.skiti.go4lunch.api.UserHelper;
 
 /**
  * Created by Skiti on 02/03/2020
@@ -99,6 +108,7 @@ public class LogginActivity extends Activity {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) { // SUCCESS
+                this.createWorkmate();
                 this.finish();
             } else { // ERRORS
                 if (response == null) {
@@ -112,4 +122,31 @@ public class LogginActivity extends Activity {
         }
     }
 
-}
+    protected OnFailureListener onFailureListener(){
+        return new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
+            }
+        };
+    }
+
+    @Nullable
+    public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+
+    private void createWorkmate() {
+        if (this.getCurrentUser() != null){
+            System.out.println("1");
+            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
+            System.out.println("2");
+            String name = this.getCurrentUser().getDisplayName();
+            System.out.println("3");
+            String uid = this.getCurrentUser().getUid();
+            System.out.println("4");
+            UserHelper.createWorkmate(uid,urlPicture, name).addOnFailureListener(this.onFailureListener());
+            System.out.println("5");
+        }
+    }
+    }
+
+

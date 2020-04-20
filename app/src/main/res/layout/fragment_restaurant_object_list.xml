@@ -33,7 +33,7 @@
         tools:layout_editor_absoluteY="28dp" />
 
     <TextView
-        android:id="@+id/adress_restaurant3"
+        android:id="@+id/Open_hour"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -46,7 +46,7 @@
         tools:layout_editor_absoluteY="50dp" />
 
     <TextView
-        android:id="@+id/adress_restaurant2"
+        android:id="@+id/distance_restaurant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
@@ -104,7 +104,7 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/adress_restaurant5"
+        android:id="@+id/workmate_on_restaurant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"

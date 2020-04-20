@@ -1,4 +1,4 @@
-package cfwz.skiti.go4lunch.model;
+package cfwz.skiti.go4lunch.models;
 
 import androidx.annotation.Nullable;
 
@@ -9,22 +9,23 @@ import java.util.ArrayList;
  */
 
 public class Workmate {
-    @Nullable String urlPicture;
+    private String uid;
+    private @Nullable String urlPicture;
     private String name;
     private String restaurant;
     private ArrayList<String>favorite = new ArrayList<>();
 
     public Workmate() {}
 
-    public Workmate(@Nullable String urlPicture, String name, String restaurant, ArrayList<String> favorite) {
+    public Workmate(String uid,@Nullable String urlPicture, String name) {
+        this.uid = uid;
         this.urlPicture = urlPicture;
         this.name = name;
-        this.restaurant = restaurant;
-        this.favorite = favorite;
     }
 
 
     //GETTER
+    public String getUid() { return uid; }
     @Nullable
     public String getUrlPicture() { return urlPicture; }
     public String getName() { return name; }
@@ -33,6 +34,8 @@ public class Workmate {
 
 
     //SETTER
+
+    public void setUid(String uid) { this.uid = uid; }
     public void setUrlPicture(@Nullable String urlPicture) { this.urlPicture = urlPicture; }
     public void setName(String name) { this.name = name; }
     public void setRestaurant(String restaurant) { this.restaurant = restaurant; }
