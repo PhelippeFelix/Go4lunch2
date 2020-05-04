@@ -27,7 +27,9 @@ public class Workmate {
     //GETTER
     public String getUid() { return uid; }
     @Nullable
-    public String getUrlPicture() { return urlPicture; }
+    public String getUrlPicture() {
+        if (urlPicture !=null) return urlPicture;
+        else return "https://revuelespritlibre.org/sites/revuelespritlibre.org/files/portraits/userportrait.jpg";}
     public String getName() { return name; }
     public String getRestaurant() { return restaurant; }
     public ArrayList<String> getFavorite() { return favorite; }

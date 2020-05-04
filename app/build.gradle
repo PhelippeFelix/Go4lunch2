@@ -37,13 +37,15 @@ dependencies {
 
     //Google
     implementation 'com.google.android.libraries.places:places:2.2.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
 
-    // Include all the Twitter APIs
+            // Include all the Twitter APIs
     implementation 'com.twitter.sdk.android:twitter:3.1.1'
 
     //Facebook
     implementation 'com.facebook.android:facebook-android-sdk:4.42.0'
+
 
     //FireBase UI
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
@@ -57,6 +59,7 @@ dependencies {
 
     //Butterknife
     implementation 'com.jakewharton:butterknife:10.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
 
     //GLIDE

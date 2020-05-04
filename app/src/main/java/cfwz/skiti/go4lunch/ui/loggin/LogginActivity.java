@@ -136,15 +136,10 @@ public class LogginActivity extends Activity {
 
     private void createWorkmate() {
         if (this.getCurrentUser() != null){
-            System.out.println("1");
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-            System.out.println("2");
             String name = this.getCurrentUser().getDisplayName();
-            System.out.println("3");
             String uid = this.getCurrentUser().getUid();
-            System.out.println("4");
             UserHelper.createWorkmate(uid,urlPicture, name).addOnFailureListener(this.onFailureListener());
-            System.out.println("5");
         }
     }
     }

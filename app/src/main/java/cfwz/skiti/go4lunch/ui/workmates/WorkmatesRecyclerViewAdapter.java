@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 
 import java.util.List;
 
@@ -22,12 +23,12 @@ import cfwz.skiti.go4lunch.models.Workmate;
 
 import static androidx.core.content.ContextCompat.startActivity;
 
-public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<WorkmatesRecyclerViewAdapter.ViewHolder> {
+public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<WorkmatesRecyclerViewAdapter.ViewHolder > {
 
     private final List<Workmate> mWorkmates;
+    private String restaurant;
 
-    public WorkmatesRecyclerViewAdapter(List<Workmate> items) {
-        mWorkmates = items;
+    public WorkmatesRecyclerViewAdapter(List<Workmate> items) { mWorkmates = items;
     }
 
     @Override
@@ -41,11 +42,19 @@ public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<Workmates
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Workmate workmate = mWorkmates.get(position);
-        holder.mNeighbourName.setText(workmate.getName());
+        restaurant = googlePlaceToName(workmate.getRestaurant());
+        holder.mWorkmakeName.setText(workmate.getName()+ restaurant);
         Glide.with(holder.mWorkmateAvatar.getContext())
                 .load(workmate.getUrlPicture())
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.mWorkmateAvatar);
+    }
+
+    private String googlePlaceToName(String placeID) {
+        if (placeID!=null){
+
+            return placeID;
+        }else return " hasn't decided yet";
     }
 
 
@@ -58,7 +67,7 @@ public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<Workmates
         @BindView(R.id.item_list_avatar)
         public ImageView mWorkmateAvatar;
         @BindView(R.id.item_list_name)
-        public TextView mNeighbourName;
+        public TextView mWorkmakeName;
 
         public ViewHolder(View view) {
             super(view);

@@ -3,6 +3,7 @@ package cfwz.skiti.go4lunch.ui.workmates;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -31,9 +38,11 @@ import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.UserHelper;
 import cfwz.skiti.go4lunch.models.Workmate;
 
+import static com.firebase.ui.auth.ui.email.EmailLinkFragment.TAG;
+
 public class WorkmatesFragment extends Fragment {
 
-    private List<Workmate> mWorkmates;
+    private List<Workmate> mWorkmates = new ArrayList<>();
     private RecyclerView mRecyclerView;
 
 
@@ -65,10 +74,24 @@ public class WorkmatesFragment extends Fragment {
      * Init the List of neighbours
      */
     private void initList() {
-       // mWorkmates = UserHelper.getAllWorkmates();
-        mRecyclerView.setAdapter(new WorkmatesRecyclerViewAdapter(mWorkmates));
+        UserHelper.getWorkmatesCollection()
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        mWorkmates.clear();
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                mWorkmates.add(document.toObject(Workmate.class));
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                        mRecyclerView.setAdapter(new WorkmatesRecyclerViewAdapter(mWorkmates));
+                    }
+                });
     }
-
 
     /**
      * Fired if the user clicks on a delete button
