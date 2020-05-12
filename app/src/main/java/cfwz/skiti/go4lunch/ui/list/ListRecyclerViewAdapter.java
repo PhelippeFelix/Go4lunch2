@@ -45,11 +45,13 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerVi
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Restaurant restaurant = mRestaurants.get(position);
         holder.mNameRestaurant.setText(restaurant.getName());
+        holder.mAdressRestaurant.setText(restaurant.getAdress());
+        holder.mOpenHour.setText(restaurant.getOpeningTime());
         Glide.with(holder.mAvatarRestaurant.getContext())
-                .load(restaurant.get())
+                .load(restaurant.getUrlAvatar())
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.mAvatarRestaurant);
-        
+
     }
 
     @Override

@@ -11,15 +11,18 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.UserHelper;
+import cfwz.skiti.go4lunch.models.Restaurant;
 import cfwz.skiti.go4lunch.models.Workmate;
 
 public class ListFragment extends Fragment {
 
-    private List<Workmate> mWorkmates;
+    private List<Restaurant> mRestaurants = new ArrayList<>();
     private RecyclerView mRecyclerView;
 
 
