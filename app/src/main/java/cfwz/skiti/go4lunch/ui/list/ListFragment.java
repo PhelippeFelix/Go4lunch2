@@ -1,6 +1,9 @@
 package cfwz.skiti.go4lunch.ui.list;
 
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,17 +22,21 @@ import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.UserHelper;
 import cfwz.skiti.go4lunch.models.Restaurant;
 import cfwz.skiti.go4lunch.models.Workmate;
+import cfwz.skiti.go4lunch.stream.GoogleApi;
+import cfwz.skiti.go4lunch.ui.list.ListRecyclerViewAdapter;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 public class ListFragment extends Fragment {
 
     private List<Restaurant> mRestaurants = new ArrayList<>();
     private RecyclerView mRecyclerView;
+    private GoogleApi mGoogleApi = new GoogleApi();
 
 
 
     public static ListFragment newInstance() {
-        ListFragment fragment = new ListFragment();
-        return fragment;
+        return new ListFragment();
     }
 
     @Override
@@ -50,17 +57,12 @@ public class ListFragment extends Fragment {
         return view;
     }
 
+
     /**
      * Init the List of neighbours
      */
     private void initList() {
-        //mWorkmates = UserHelper.getAllWorkmates();
-       // mRecyclerView.setAdapter(new ListRecyclerViewAdapter(mWorkmates));
+      mRestaurants = mGoogleApi.getRestaurantList("-33.8670522,151.1957362");
+      mRecyclerView.setAdapter(new ListRecyclerViewAdapter(mRestaurants));
     }
-
-
-    /**
-     * Fired if the user clicks on a delete button
-     * @param event
-     */
 }

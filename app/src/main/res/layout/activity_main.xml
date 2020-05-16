@@ -16,13 +16,13 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/activity_main_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/App_bar_height"
-        android:background="@color/colorPrimary"
-        app:titleTextColor="@color/cardview_light_background"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/elevation_size"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
-
+        android:background="@color/colorPrimaryDark"
+        app:theme="@style/ToolBarStyle"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
@@ -51,15 +51,31 @@
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/activity_main_nav_view"
+<com.google.android.material.navigation.NavigationView
+android:id="@+id/activity_main_nav_view"
+android:layout_width="wrap_content"
+android:layout_height="match_parent"
+android:layout_gravity="start"
+android:fitsSystemWindows="true"
+app:headerLayout="@layout/activity_main_nav_header"
+app:menu="@menu/activity_main_drawer"
+android:background="@color/colorSalmon"
+app:itemTextColor="@color/colorWhite">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    >
+
+    <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/activity_main_nav_header"
-        app:menu="@menu/activity_main_drawer"
-        android:layout_gravity="start"
-        android:background="@color/colorPrimary"
-        app:itemTextColor="@color/cardview_light_background"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_logo_go4lunch"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

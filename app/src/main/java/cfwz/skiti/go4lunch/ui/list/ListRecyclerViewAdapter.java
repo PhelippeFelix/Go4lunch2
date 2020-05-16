@@ -1,4 +1,4 @@
-package cfwz.skiti.go4lunch.ui.workmates;
+package cfwz.skiti.go4lunch.ui.list;
 
 import android.content.Intent;
 import android.provider.ContactsContract;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,13 +23,14 @@ import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.models.Restaurant;
 import cfwz.skiti.go4lunch.models.Workmate;
+import cfwz.skiti.go4lunch.stream.GoogleApi;
 
 import static androidx.core.content.ContextCompat.startActivity;
 
 public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerViewAdapter.ViewHolder > {
 
     private final List<Restaurant> mRestaurants;
-    private String restaurant;
+    private GoogleApi mGoogleApi = new GoogleApi();
 
     public ListRecyclerViewAdapter(List<Restaurant> items) { mRestaurants = items;
     }
@@ -43,12 +45,11 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerVi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Restaurant restaurant = mRestaurants.get(position);
-        holder.mNameRestaurant.setText(restaurant.getName());
-        holder.mAdressRestaurant.setText(restaurant.getAdress());
-        holder.mOpenHour.setText(restaurant.getOpeningTime());
+        Restaurant restaurant = mGoogleApi.getRestaurantInfo(mRestaurants.get(position).getResult().getPlaceId());
+        holder.mNameRestaurant.setText(restaurant.getResult().getName());
+        holder.mAdressRestaurant.setText(restaurant.getResult().getFormattedAddress());
         Glide.with(holder.mAvatarRestaurant.getContext())
-                .load(restaurant.getUrlAvatar())
+                .load(restaurant.getResult().getIcon())
                 .apply(RequestOptions.circleCropTransform())
                 .into(holder.mAvatarRestaurant);
 
@@ -64,10 +65,9 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerVi
         @BindView(R.id.adress_restaurant) public TextView mAdressRestaurant;
         @BindView(R.id.Open_hour) public TextView mOpenHour;
         @BindView(R.id.distance_restaurant) public TextView mDistance;
-        @BindView(R.id.star_restaurant) public ImageView mStar1;
-        @BindView(R.id.star_restaurant2) public ImageView mStar2;
-        @BindView(R.id.star_restaurant3) public ImageView mStar3;
+        @BindView(R.id.star_restaurant) public RatingBar mStar;
         @BindView(R.id.workmate_on_restaurant) public TextView mWorkmateOnIt;
+        @BindView(R.id.workmate_on_restaurant_image) public ImageView mWorkmateImage;
         @BindView(R.id.item_avatar_restaurant) public ImageView mAvatarRestaurant;
 
         public ViewHolder(View view) {

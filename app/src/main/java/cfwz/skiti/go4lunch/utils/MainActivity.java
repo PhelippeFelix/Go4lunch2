@@ -1,4 +1,4 @@
-package cfwz.skiti.go4lunch;
+package cfwz.skiti.go4lunch.utils;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,18 +35,18 @@ import androidx.viewpager.widget.ViewPager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.ui.loggin.LogginActivity;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
      Toolbar toolbar;
      DrawerLayout drawerLayout;
      NavigationView navigationView;
     private static final int SIGN_OUT_TASK = 10;
     private static final int UPDATE_USERNAME = 30;
-    String key = "AIzaSyBm5KR0R5LIAKLlQZoiodV6rbQ61iClmL4";
 
-
+    ImageView backgroundView;
     ImageView imageProfileView;
     TextView nameUser;
     TextView emailUser;
@@ -67,8 +67,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.updateUI();
         ButterKnife.bind(this);
     }
-
-
 
     protected OnFailureListener onFailureListener(){
         return new OnFailureListener() {
@@ -93,12 +91,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // 1 - Update UI when activity is creating
     private void updateUI(){
-        if (isCurrentUserLogged()){
-
+        if (isCurrentUserLogged()) {
             //Get picture URL from Firebase
             if (this.getCurrentUser().getPhotoUrl() != null) {
                 Glide.with(this)
                         .load(this.getCurrentUser().getPhotoUrl())
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(imageProfileView);
+            } else {
+                Glide.with(this)
+                        .load(R.drawable.default_image)
                         .apply(RequestOptions.circleCropTransform())
                         .into(imageProfileView);
             }
@@ -110,6 +112,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //Update views with data
             this.nameUser.setText(username);
             this.emailUser.setText(email);
+
+
+            Glide.with(this)
+                    .load(R.drawable.side_nav_bar)
+                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
+                    .into(backgroundView);
         }
     }
 
@@ -140,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         imageProfileView = (ImageView) headerLayout.findViewById(R.id.imageProfileView);
         emailUser = (TextView) headerLayout.findViewById(R.id.emailUser);
         nameUser = (TextView) headerLayout.findViewById(R.id.nameUser);
+        backgroundView = (ImageView) headerLayout.findViewById(R.id.side_nav_bar);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -162,14 +171,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-
         //  Handle Navigation Item Click
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_lunch:
-                break;
             case R.id.nav_settings:
-                break;
             case R.id.nav_logout:
                 this.signOutUserFromFirebase();
             default:

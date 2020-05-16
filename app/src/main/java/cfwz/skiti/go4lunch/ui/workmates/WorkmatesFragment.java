@@ -37,10 +37,11 @@ import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.UserHelper;
 import cfwz.skiti.go4lunch.models.Workmate;
+import cfwz.skiti.go4lunch.utils.BaseFragment;
 
 import static com.firebase.ui.auth.ui.email.EmailLinkFragment.TAG;
 
-public class WorkmatesFragment extends Fragment {
+public class WorkmatesFragment extends BaseFragment {
 
     private List<Workmate> mWorkmates = new ArrayList<>();
     private RecyclerView mRecyclerView;

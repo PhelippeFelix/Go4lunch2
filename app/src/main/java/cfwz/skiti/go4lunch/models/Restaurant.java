@@ -1,58 +1,68 @@
 package cfwz.skiti.go4lunch.models;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
 /**
  * Created by Skiti on 23/03/2020
  */
 
-public class Restaurant {
-    private String placeId;
-    private String name;
-    private String urlAvatar;
-    private String adress;
-    private String openingTime;
-    private String website;
+    public class Restaurant {
 
-    private int distance;
-    private long rating;
-    private int workmatesHere;
-    private int phone;
+    @SerializedName("html_attributions")
+    @Expose
+    private List<Object> htmlAttributions = null;
+    @SerializedName("result")
+    @Expose
+    private Result result;
+    @SerializedName("status")
+    @Expose
+    private String status;
+    @SerializedName("next_page_token")
+    @Expose
+    private String nextPageToken;
+    @SerializedName("results")
+    @Expose
+    private List<Result> results = null;
 
-    public Restaurant(){}
-
-    public Restaurant(String placeId,String name,String urlAvatar, String adress, String openingTime, String website, int distance, long rating, int workmatesHere, int phone) {
-        this.placeId = placeId;
-        this.name = name;
-        this.urlAvatar = urlAvatar;
-        this.adress = adress;
-        this.openingTime = openingTime;
-        this.website = website;
-        this.distance = distance;
-        this.rating = rating;
-        this.workmatesHere = workmatesHere;
-        this.phone = phone;
+    public String getNextPageToken() {
+        return nextPageToken;
     }
 
-    // GETTER
-    public String getPlaceId() { return placeId; }
-    public String getName() { return name; }
-    public String getUrlAvatar() { return urlAvatar; }
-    public String getAdress() { return adress; }
-    public String getOpeningTime() { return openingTime; }
-    public String getWebsite() { return website; }
-    public int getDistance() { return distance; }
-    public long getRating() { return rating; }
-    public int getWorkmatesHere() { return workmatesHere; }
-    public int getPhone() { return phone; }
+    public void setNextPageToken(String nextPageToken) {
+        this.nextPageToken = nextPageToken;
+    }
 
-    // SETTER
-    public void setPlaceId(String placeId) { this.placeId = placeId; }
-    public void setName(String name) { this.name = name; }
-    public void setUrlAvatar(String urlAvatar) { this.urlAvatar = urlAvatar; }
-    public void setAdress(String adress) { this.adress = adress; }
-    public void setOpeningTime(String openingTime) { this.openingTime = openingTime; }
-    public void setWebsite(String website) { this.website = website; }
-    public void setDistance(int distance) { this.distance = distance; }
-    public void setRating(long rating) { this.rating = rating; }
-    public void setWorkmatesHere(int workmatesHere) { this.workmatesHere = workmatesHere; }
-    public void setPhone(int phone) { this.phone = phone; }
+    public List<Result> getResults() {
+        return results;
+    }
+
+    public void setResults(List<Result> results) {
+        this.results = results;
+    }
+
+    public List<Object> getHtmlAttributions() {
+        return htmlAttributions;
+    }
+
+    public void setHtmlAttributions(List<Object> htmlAttributions) {
+        this.htmlAttributions = htmlAttributions;
+    }
+
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
+

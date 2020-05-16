@@ -3,13 +3,10 @@ package cfwz.skiti.go4lunch.ui.loggin;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.firebase.ui.auth.AuthUI;
@@ -20,15 +17,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.lang.reflect.Array;
-import java.sql.SQLOutput;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import cfwz.skiti.go4lunch.MainActivity;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.UserHelper;
 
@@ -42,6 +34,7 @@ public class LogginActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_log);
         ButterKnife.bind(this);
+        this.startSignInActivity();
     }
 
     //FOR DATA
@@ -55,13 +48,6 @@ public class LogginActivity extends Activity {
     // --------------------
     // ACTIONS
     // --------------------
-
-    @OnClick(R.id.button_log)
-    public void onClickLoginButton() {
-        this.startSignInActivity();
-    }
-
-
     // --------------------
     // NAVIGATION
     // --------------------
@@ -77,7 +63,7 @@ public class LogginActivity extends Activity {
                                 new AuthUI.IdpConfig.FacebookBuilder().build(),
                                 new AuthUI.IdpConfig.GoogleBuilder().build()))
                         .setIsSmartLockEnabled(false, true)
-                        .setLogo(R.drawable.ic_logo_auth)
+                        .setLogo(R.drawable.logo_loggin)
                         .build(),
                 RC_SIGN_IN);
     }

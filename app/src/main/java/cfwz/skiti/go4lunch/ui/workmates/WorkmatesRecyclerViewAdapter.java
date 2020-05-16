@@ -44,11 +44,12 @@ public class WorkmatesRecyclerViewAdapter extends RecyclerView.Adapter<Workmates
         Workmate workmate = mWorkmates.get(position);
         restaurant = googlePlaceToName(workmate.getRestaurant());
         holder.mWorkmakeName.setText(workmate.getName()+ restaurant);
+        if (workmate.getUrlPicture()!=null){
         Glide.with(holder.mWorkmateAvatar.getContext())
                 .load(workmate.getUrlPicture())
                 .apply(RequestOptions.circleCropTransform())
-                .into(holder.mWorkmateAvatar);
-    }
+                .into(holder.mWorkmateAvatar);}
+        }
 
     private String googlePlaceToName(String placeID) {
         if (placeID!=null){

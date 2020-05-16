@@ -1,12 +1,11 @@
 package cfwz.skiti.go4lunch.ui.restaurant_profile;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
 import butterknife.ButterKnife;
-import cfwz.skiti.go4lunch.MainActivity;
+import cfwz.skiti.go4lunch.utils.MainActivity;
 import cfwz.skiti.go4lunch.R;
 
 /**
