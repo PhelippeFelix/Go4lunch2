@@ -1,31 +1,29 @@
-package cfwz.skiti.go4lunch.models;
 
-import com.google.gson.annotations.Expose;
+package cfwz.skiti.go4lunch.model.GooglePlaces;
 import com.google.gson.annotations.SerializedName;
+
 
 public class Viewport {
 
     @SerializedName("northeast")
-    @Expose
-    private Northeast northeast;
+    private Northeast mNortheast;
     @SerializedName("southwest")
-    @Expose
-    private Southwest southwest;
+    private Southwest mSouthwest;
 
     public Northeast getNortheast() {
-        return northeast;
+        return mNortheast;
     }
 
     public void setNortheast(Northeast northeast) {
-        this.northeast = northeast;
+        mNortheast = northeast;
     }
 
     public Southwest getSouthwest() {
-        return southwest;
+        return mSouthwest;
     }
 
     public void setSouthwest(Southwest southwest) {
-        this.southwest = southwest;
+        mSouthwest = southwest;
     }
 
 }

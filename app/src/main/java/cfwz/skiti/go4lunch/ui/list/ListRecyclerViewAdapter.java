@@ -1,78 +1,46 @@
 package cfwz.skiti.go4lunch.ui.list;
 
-import android.content.Intent;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
-import cfwz.skiti.go4lunch.models.Restaurant;
-import cfwz.skiti.go4lunch.models.Workmate;
-import cfwz.skiti.go4lunch.stream.GoogleApi;
+import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
 
-import static androidx.core.content.ContextCompat.startActivity;
+public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListViewHolder> {
 
-public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListRecyclerViewAdapter.ViewHolder > {
+    private List<ResultDetails> mResultDetails;
+    private String mLocation;
 
-    private final List<Restaurant> mRestaurants;
-    private GoogleApi mGoogleApi = new GoogleApi();
-
-    public ListRecyclerViewAdapter(List<Restaurant> items) { mRestaurants = items;
-    }
+    public ListRecyclerViewAdapter(List<ResultDetails> items) {
+        mResultDetails = items;
+        mLocation = "-33.8670522,151.1957362";}
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_restaurant_object_list, parent, false);
-        return new ViewHolder(view);
+        return new ListViewHolder(view);
     }
 
-
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        Restaurant restaurant = mGoogleApi.getRestaurantInfo(mRestaurants.get(position).getResult().getPlaceId());
-        holder.mNameRestaurant.setText(restaurant.getResult().getName());
-        holder.mAdressRestaurant.setText(restaurant.getResult().getFormattedAddress());
-        Glide.with(holder.mAvatarRestaurant.getContext())
-                .load(restaurant.getResult().getIcon())
-                .apply(RequestOptions.circleCropTransform())
-                .into(holder.mAvatarRestaurant);
+    public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
+        holder.updateWithData(this.mResultDetails.get(position), this.mLocation);
+    }
 
+    public ResultDetails getRestaurantDetails(int position){
+        return this.mResultDetails.get(position);
     }
 
     @Override
     public int getItemCount() {
-        return mRestaurants.size();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.name_restaurant) public TextView mNameRestaurant;
-        @BindView(R.id.adress_restaurant) public TextView mAdressRestaurant;
-        @BindView(R.id.Open_hour) public TextView mOpenHour;
-        @BindView(R.id.distance_restaurant) public TextView mDistance;
-        @BindView(R.id.star_restaurant) public RatingBar mStar;
-        @BindView(R.id.workmate_on_restaurant) public TextView mWorkmateOnIt;
-        @BindView(R.id.workmate_on_restaurant_image) public ImageView mWorkmateImage;
-        @BindView(R.id.item_avatar_restaurant) public ImageView mAvatarRestaurant;
-
-        public ViewHolder(View view) {
-            super(view);
-            ButterKnife.bind(this, view);
-        }
+        int itemCount = 0;
+        if (mResultDetails != null) itemCount = mResultDetails.size();
+        return itemCount;
     }
 }

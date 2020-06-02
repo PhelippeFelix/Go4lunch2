@@ -1,31 +1,31 @@
-package cfwz.skiti.go4lunch.models;
 
-import com.google.gson.annotations.Expose;
+package cfwz.skiti.go4lunch.model.GooglePlaces;
+
+
 import com.google.gson.annotations.SerializedName;
 
-public class Location {
+
+public class Northeast {
 
     @SerializedName("lat")
-    @Expose
-    private Double lat;
+    private Double mLat;
     @SerializedName("lng")
-    @Expose
-    private Double lng;
+    private Double mLng;
 
     public Double getLat() {
-        return lat;
+        return mLat;
     }
 
     public void setLat(Double lat) {
-        this.lat = lat;
+        mLat = lat;
     }
 
     public Double getLng() {
-        return lng;
+        return mLng;
     }
 
     public void setLng(Double lng) {
-        this.lng = lng;
+        mLng = lng;
     }
 
 }

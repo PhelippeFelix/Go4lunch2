@@ -58,7 +58,7 @@ dependencies {
     implementation 'jp.wasabeef:glide-transformations:4.1.0'
 
     //EASY PERMISSIONS
-    implementation 'pub.devrel:easypermissions:1.1.1'
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
     // JODA TIME
     implementation 'joda-time:joda-time:2.10'

@@ -7,43 +7,42 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.tabs.TabLayout;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
+import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.api.UserHelper;
-import cfwz.skiti.go4lunch.models.Workmate;
+import cfwz.skiti.go4lunch.model.Workmate;
+import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
 import cfwz.skiti.go4lunch.utils.BaseFragment;
+import cfwz.skiti.go4lunch.utils.ItemClickSupport;
+import cfwz.skiti.go4lunch.utils.MainActivity;
 
 import static com.firebase.ui.auth.ui.email.EmailLinkFragment.TAG;
 
 public class WorkmatesFragment extends BaseFragment {
-
     private List<Workmate> mWorkmates = new ArrayList<>();
+    private WorkmatesRecyclerViewAdapter mViewAdapter;
     private RecyclerView mRecyclerView;
 
 
@@ -63,17 +62,19 @@ public class WorkmatesFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
+        ButterKnife.bind(this, view);
         Context context = view.getContext();
+        initList();
         mRecyclerView = (RecyclerView) view;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        initList();
+        configureOnClickRecyclerView();
+        this.mViewAdapter = new WorkmatesRecyclerViewAdapter(this.mWorkmates);
+        this.mRecyclerView.setAdapter(this.mViewAdapter);
         return view;
     }
 
-    /**
-     * Init the List of neighbours
-     */
+
     private void initList() {
         UserHelper.getWorkmatesCollection()
                 .get()
@@ -94,8 +95,33 @@ public class WorkmatesFragment extends BaseFragment {
                 });
     }
 
-    /**
-     * Fired if the user clicks on a delete button
-     * @param event
-     */
+
+        private void configureOnClickRecyclerView(){
+        ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_workmates_object_list)
+                .setOnItemClickListener((recyclerView, position, v) -> {
+                    Workmate result = mViewAdapter.getWorkmates(position);
+                    ProfileRestaurantByWorkmate(result);
+                });
+    }
+
+
+    private void ProfileRestaurantByWorkmate(Workmate workmate){
+        RestaurantsHelper.getBooking(workmate.getUid(),getTodayDate()).addOnCompleteListener(bookingTask -> {
+            if (bookingTask.isSuccessful()){
+                if (!(Objects.requireNonNull(bookingTask.getResult()).isEmpty())){
+                    for (QueryDocumentSnapshot booking : bookingTask.getResult()){
+                        showBookedRestaurantByUser(Objects.requireNonNull(booking.getData().get("restaurantId")).toString());
+                    }
+                }else{
+                    Toast.makeText(getContext(), getResources().getString(R.string.mates_hasnt_decided,workmate.getName()), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void showBookedRestaurantByUser(String placeId){
+        Intent intent = new Intent(getActivity(), ProfileActivity.class);
+        intent.putExtra("PlaceDetailResult", placeId);
+        startActivity(intent);
+    }
 }

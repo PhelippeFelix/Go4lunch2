@@ -1,35 +1,70 @@
 package cfwz.skiti.go4lunch.ui.map;
 
-import android.content.Context;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import butterknife.BindView;
+import cfwz.skiti.go4lunch.api.RestaurantsHelper;
+import cfwz.skiti.go4lunch.model.GooglePlaces.SearchPlace;
+import cfwz.skiti.go4lunch.stream.GoogleApi;
+import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
+import cfwz.skiti.go4lunch.utils.BaseFragment;
+import pub.devrel.easypermissions.EasyPermissions;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import cfwz.skiti.go4lunch.R;
+import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
+import cfwz.skiti.go4lunch.model.GooglePlaces.ResultSearch;
+import cfwz.skiti.go4lunch.stream.GooglePlaceDetailsCalls;
+import cfwz.skiti.go4lunch.stream.GooglePlaceSearchCalls;
 
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+public class MapFragment extends BaseFragment implements LocationListener, GooglePlaceDetailsCalls.Callbacks, GooglePlaceSearchCalls.Callbacks {
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+    @BindView(R.id.map) MapView mMapView;
+    private static final int PERMS_FINE_COARSE_LOCATION = 100;
+    private static final String TAG = MapFragment.class.getSimpleName();
+    private static final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    public static final String SEARCH_TYPE = "restaurant";
 
-        private GoogleMap mMap;
+    private GoogleMap googleMap;
+    private GoogleApi mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mLocationCallback;
+    private MapViewModel mViewModel;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,16 +79,158 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             return view;
         }
+    private void configureMapView() {
+        try {
+            MapsInitializer.initialize(getActivity().getBaseContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mMapView.getMapAsync(new OnMapReadyCallback() {
 
-        @Override
-        public void onMapReady(GoogleMap googleMap) {
-            mMap = googleMap;
+            @Override
+            public void onMapReady(GoogleMap mMap) {
+                googleMap = mMap;
+                if (checkLocationPermission()) {
+                    //Request location updates:
+                    googleMap.setMyLocationEnabled(true);
+                }
+                googleMap.getUiSettings().setCompassEnabled(true);
+                googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+                View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).
+                        getParent()).findViewById(Integer.parseInt("2"));
 
-            // Add a marker in Sydney and move the camera
-            LatLng sydney = new LatLng(-34, 151);
-            mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                // and next place it, for example, on bottom right (as Google Maps app)
+                googleMap.getUiSettings().setRotateGesturesEnabled(true);
+                googleMap.setOnMarkerClickListener(MapFragment.this::onClickMarker);
+            }
+        });
+    }
+    private void updateUI( SearchPlace results){
+        googleMap.clear();
+        if(results instanceof SearchPlace){
+            Log.e(TAG, "updateUI: " + results.getResultSearches().size());
+            if (results.getResultSearches().size() > 0){
+                for (int i = 0; i < results.getResultSearches().size(); i++) {
+                    int CurrentObject = i;
+                    RestaurantsHelper.getTodayBooking(results.getResultSearches().get(CurrentObject).getPlaceId(), getTodayDate()).addOnCompleteListener(restaurantTask -> {
+                        if (restaurantTask.isSuccessful()) {
+                            Double lat = results.getResultSearches().get(CurrentObject).getGeometry().getLocation().getLat();
+                            Double lng = results.getResultSearches().get(CurrentObject).getGeometry().getLocation().getLng();
+                            String title = results.getResultSearches().get(CurrentObject).getName();
+
+                            MarkerOptions markerOptions = new MarkerOptions();
+                            markerOptions.position(new LatLng(lat, lng));
+                            markerOptions.title(title);
+                            if (restaurantTask.getResult().isEmpty()) { // If there is no booking for today
+                                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.lunch_marker_nobody));
+                            } else { // If there is booking for today
+                                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.lunch_marker_someone_here));
+                            }
+                            Marker marker = googleMap.addMarker(markerOptions);
+                            marker.setTag(results.getResultSearches().get(CurrentObject).getPlaceId());
+                        }
+                    });
+                }
+            }else{
+                Toast.makeText(getContext(), getResources().getString(R.string.no_restaurant_error_message), Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
+    private void handleNewLocation(Location location) {
+        Log.e(TAG, "handleNewLocation: " );
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+
+        this.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.mViewModel.getCurrentUserPosition()));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(this.mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
+        stopLocationUpdates();
+    }
+
+    private void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+    }
+
+    private void startLocationUpdates() {
+        if (checkLocationPermission()){
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+        }
+    }
+
+    private void configureLocationRequest(){
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(100 * 1000)        // 100 seconds, in milliseconds
+                .setFastestInterval(1000); // 1 second, in milliseconds
+    }
+
+    private void configureLocationCallBack() {
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    handleNewLocation(location);
+                }
+            }
+        };
+    }
+
+    public boolean checkLocationPermission() {
+        if (EasyPermissions.hasPermissions(getContext(), perms)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {googleMap.setMyLocationEnabled(true);}
+    }
+
+    private boolean onClickMarker(Marker marker){
+        if (marker.getTag() != null){
+            Log.e(TAG, "onClickMarker: " + marker.getTag() );
+            Intent intent = new Intent(getActivity(), ProfileActivity.class);
+            intent.putExtra("PlaceDetailResult", marker.getTag().toString());
+            startActivity(intent);
+            return true;
+        }else{
+            Log.e(TAG, "onClickMarker: ERROR NO TAG" );
+            return false;
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        handleNewLocation(location);
+    }
+
+    @Override
+    public void onResponse(@Nullable ResultDetails resultDetails) {
+
+    }
+
+    @Override
+    public void onResponse(@Nullable List<ResultSearch> resultSearchList) {
+
+    }
+
+    @Override
+    public void onFailure() {
+
+    }
+}
 
 

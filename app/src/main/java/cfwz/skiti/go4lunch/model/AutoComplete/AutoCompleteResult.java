@@ -1,6 +1,4 @@
-package cfwz.skiti.go4lunch.models;
-
-import android.gesture.Prediction;
+package cfwz.skiti.go4lunch.model.AutoComplete;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -8,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * Created by Skiti on 16/05/2020
+ * Created by Skiti on 18/05/2020
  */
 
 public class AutoCompleteResult {

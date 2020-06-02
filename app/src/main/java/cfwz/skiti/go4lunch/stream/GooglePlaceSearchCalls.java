@@ -2,9 +2,14 @@ package cfwz.skiti.go4lunch.stream;
 
 
 import androidx.annotation.Nullable;
+
+import com.google.android.gms.maps.GoogleMap;
+
 import java.lang.ref.WeakReference;
 import java.util.List;
-import cfwz.skiti.go4lunch.models.Restaurant;
+
+import cfwz.skiti.go4lunch.model.GooglePlaces.ResultSearch;
+import cfwz.skiti.go4lunch.model.GooglePlaces.SearchPlace;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -15,13 +20,13 @@ import retrofit2.Response;
 
 public class GooglePlaceSearchCalls {
     static String apiKey = "AIzaSyBm5KR0R5LIAKLlQZoiodV6rbQ61iClmL4";
-    static int radius = 1500;
     static String type = "restaurant";
+    static String rankby = "distance";
 
 
         // 1 - Creating a callback
         public interface Callbacks {
-            void onResponse(@Nullable List<Restaurant> restaurantList);
+            void onResponse(@Nullable List<ResultSearch> resultSearchList);
             void onFailure();
         }
 
@@ -35,19 +40,23 @@ public class GooglePlaceSearchCalls {
             GooglePlaceSearch googlePlaceSearch = GooglePlaceSearch.retrofit.create(GooglePlaceSearch.class);
 
             // 2.3 - Create the call on Github API
-            Call<List<Restaurant>> call = googlePlaceSearch.getNearbyRestaurants(location,radius,type,apiKey);
+            Call<SearchPlace> call = googlePlaceSearch.getNearbyRestaurants(location,rankby,type,apiKey);
             // 2.4 - Start the call
-            call.enqueue(new Callback<List<Restaurant>>() {
+            call.enqueue(new Callback<SearchPlace>() {
 
                 @Override
-                public void onResponse(Call<List<Restaurant>> call, Response<List<Restaurant>> response) {
+                public void onResponse(Call<SearchPlace> call, Response<SearchPlace> response) {
                     // 2.5 - Call the proper callback used in controller (MainFragment)
-                    if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onResponse(response.body());
+                    if (callbacksWeakReference.get() != null) {
+                        SearchPlace searchPlace = response.body();
+                        List<ResultSearch> resultSearchList = searchPlace.getResultSearches();
+                        callbacksWeakReference.get().onResponse(resultSearchList);}
                 }
 
                 @Override
-                public void onFailure(Call<List<Restaurant>> call, Throwable t) {
+                public void onFailure(Call<SearchPlace> call, Throwable t) {
                     // 2.5 - Call the proper callback used in controller (MainFragment)
+                    System.out.println(t.toString());
                     if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
                 }
             });

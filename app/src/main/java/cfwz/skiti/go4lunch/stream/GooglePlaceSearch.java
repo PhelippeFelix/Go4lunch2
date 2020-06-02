@@ -1,10 +1,6 @@
 package cfwz.skiti.go4lunch.stream;
 
-import androidx.annotation.Nullable;
-
-import java.util.List;
-
-import cfwz.skiti.go4lunch.models.Restaurant;
+import cfwz.skiti.go4lunch.model.GooglePlaces.SearchPlace;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -19,10 +15,10 @@ public interface GooglePlaceSearch {
     String BASE_URL = "https://maps.googleapis.com";
 
     @GET("/maps/api/place/nearbysearch/json")
-    Call<List<Restaurant>> getNearbyRestaurants(@Query("location") String location,
-                                                @Query("radius") int radius,
-                                                @Query("type") String type,
-                                                @Query("key") String key);
+    Call<SearchPlace> getNearbyRestaurants(@Query("location") String location,
+                                                  @Query("rankby") String rankby,
+                                                  @Query("type") String type,
+                                                  @Query("key") String key);
 
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)

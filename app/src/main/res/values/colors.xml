@@ -8,8 +8,10 @@
     <color name="colorWhite">#ffffff</color>
     <color name="colorBlack">#000000</color>
     <color name="colorStar">#ffd600</color>
-
-    <color name="colorGreen">#6BB18C</color>
+    <color name="colorCloseSoon">#ff8a65</color>
+    <color name="colorGreen">#2e7d32</color>
     <color name="colorSandLight">#ECDAAF</color>
     <color name="colorSand">#EBCB94</color>
+    <color name="colorGray">#9e9e9e</color>
+    <color name="colorDivider">#bdbdbd</color>
 </resources>

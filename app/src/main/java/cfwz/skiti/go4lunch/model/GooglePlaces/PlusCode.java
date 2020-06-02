@@ -1,31 +1,31 @@
- package cfwz.skiti.go4lunch.models;
 
-import com.google.gson.annotations.Expose;
+package cfwz.skiti.go4lunch.model.GooglePlaces;
+
+
 import com.google.gson.annotations.SerializedName;
+
 
 public class PlusCode {
 
     @SerializedName("compound_code")
-    @Expose
-    private String compoundCode;
+    private String mCompoundCode;
     @SerializedName("global_code")
-    @Expose
-    private String globalCode;
+    private String mGlobalCode;
 
     public String getCompoundCode() {
-        return compoundCode;
+        return mCompoundCode;
     }
 
     public void setCompoundCode(String compoundCode) {
-        this.compoundCode = compoundCode;
+        mCompoundCode = compoundCode;
     }
 
     public String getGlobalCode() {
-        return globalCode;
+        return mGlobalCode;
     }
 
     public void setGlobalCode(String globalCode) {
-        this.globalCode = globalCode;
+        mGlobalCode = globalCode;
     }
 
 }

@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import cfwz.skiti.go4lunch.models.Restaurant;
+import cfwz.skiti.go4lunch.model.AutoComplete.AutoCompleteResult;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,7 +23,7 @@ public class GoogleAutoCompleteCalls {
 
     // 1 - Creating a callback
     public interface Callbacks {
-        void onResponse(@Nullable List<Restaurant> restaurantList);
+        void onResponse(@Nullable AutoCompleteResult autoCompleteResult);
         void onFailure();
     }
 
@@ -37,18 +37,18 @@ public class GoogleAutoCompleteCalls {
         GoogleAutoComplete googleAutoComplete = GoogleAutoComplete.retrofit.create(GoogleAutoComplete.class);
 
         // 2.3 - Create the call on Github API
-        Call<List<Restaurant>> call = googleAutoComplete.getAutoComplete(input,types,language,location,radius,apiKey,sessiontoken);
+        Call<AutoCompleteResult> call = googleAutoComplete.getAutoComplete(input,types,language,location,radius,apiKey,sessiontoken);
         // 2.4 - Start the call
-        call.enqueue(new Callback<List<Restaurant>>() {
+        call.enqueue(new Callback<AutoCompleteResult>() {
 
             @Override
-            public void onResponse(Call<List<Restaurant>> call, Response<List<Restaurant>> response) {
+            public void onResponse(Call<AutoCompleteResult> call, Response<AutoCompleteResult> response) {
                 // 2.5 - Call the proper callback used in controller (MainFragment)
                 if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onResponse(response.body());
             }
 
             @Override
-            public void onFailure(Call<List<Restaurant>> call, Throwable t) {
+            public void onFailure(Call<AutoCompleteResult> call, Throwable t) {
                 // 2.5 - Call the proper callback used in controller (MainFragment)
                 if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
             }

@@ -1,31 +1,31 @@
-package cfwz.skiti.go4lunch.models;
 
-import com.google.gson.annotations.Expose;
+package cfwz.skiti.go4lunch.model.GooglePlaces;
+
+
 import com.google.gson.annotations.SerializedName;
+
 
 public class Geometry {
 
     @SerializedName("location")
-    @Expose
-    private Location location;
+    private Location mLocation;
     @SerializedName("viewport")
-    @Expose
-    private Viewport viewport;
+    private Viewport mViewport;
 
     public Location getLocation() {
-        return location;
+        return mLocation;
     }
 
     public void setLocation(Location location) {
-        this.location = location;
+        mLocation = location;
     }
 
     public Viewport getViewport() {
-        return viewport;
+        return mViewport;
     }
 
     public void setViewport(Viewport viewport) {
-        this.viewport = viewport;
+        mViewport = viewport;
     }
 
 }

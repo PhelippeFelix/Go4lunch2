@@ -2,7 +2,7 @@ package cfwz.skiti.go4lunch.stream;
 
 import java.util.List;
 
-import cfwz.skiti.go4lunch.models.Restaurant;
+import cfwz.skiti.go4lunch.model.AutoComplete.AutoCompleteResult;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -17,13 +17,13 @@ public interface GoogleAutoComplete {
     String BASE_URL = "https://maps.googleapis.com";
 
     @GET("/maps/api/place/autocomplete/json")
-    Call<List<Restaurant>> getAutoComplete(@Query("input") String input,
-                                           @Query("types") String types,
-                                           @Query("language") String language,
-                                           @Query("location") String location,
-                                           @Query("radius") int radius,
-                                           @Query("key") String key,
-                                           @Query("sessiontoken") int sessiontoken);
+    Call<AutoCompleteResult> getAutoComplete(@Query("input") String input,
+                                             @Query("types") String types,
+                                             @Query("language") String language,
+                                             @Query("location") String location,
+                                             @Query("radius") int radius,
+                                             @Query("key") String key,
+                                             @Query("sessiontoken") int sessiontoken);
 
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
