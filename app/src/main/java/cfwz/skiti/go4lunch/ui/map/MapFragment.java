@@ -76,9 +76,10 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
             super.onCreate(savedInstanceState);
-            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
             return view;
         }
+
     private void configureMapView() {
         try {
             MapsInitializer.initialize(getActivity().getBaseContext());
@@ -105,18 +106,18 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
             }
         });
     }
-    private void updateUI( SearchPlace results){
+    private void updateUI(List<ResultSearch> results){
         googleMap.clear();
-        if(results instanceof SearchPlace){
-            Log.e(TAG, "updateUI: " + results.getResultSearches().size());
-            if (results.getResultSearches().size() > 0){
-                for (int i = 0; i < results.getResultSearches().size(); i++) {
+        if(results instanceof ResultSearch){
+            Log.e(TAG, "updateUI: " + results.size());
+            if (results.size() > 0){
+                for (int i = 0; i < results.size(); i++) {
                     int CurrentObject = i;
-                    RestaurantsHelper.getTodayBooking(results.getResultSearches().get(CurrentObject).getPlaceId(), getTodayDate()).addOnCompleteListener(restaurantTask -> {
+                    RestaurantsHelper.getTodayBooking(results.get(CurrentObject).getPlaceId(), getTodayDate()).addOnCompleteListener(restaurantTask -> {
                         if (restaurantTask.isSuccessful()) {
-                            Double lat = results.getResultSearches().get(CurrentObject).getGeometry().getLocation().getLat();
-                            Double lng = results.getResultSearches().get(CurrentObject).getGeometry().getLocation().getLng();
-                            String title = results.getResultSearches().get(CurrentObject).getName();
+                            Double lat = results.get(CurrentObject).getGeometry().getLocation().getLat();
+                            Double lng = results.get(CurrentObject).getGeometry().getLocation().getLng();
+                            String title = results.get(CurrentObject).getName();
 
                             MarkerOptions markerOptions = new MarkerOptions();
                             markerOptions.position(new LatLng(lat, lng));
@@ -127,7 +128,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.lunch_marker_someone_here));
                             }
                             Marker marker = googleMap.addMarker(markerOptions);
-                            marker.setTag(results.getResultSearches().get(CurrentObject).getPlaceId());
+                            marker.setTag(results.get(CurrentObject).getPlaceId());
                         }
                     });
                 }
@@ -224,7 +225,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
 
     @Override
     public void onResponse(@Nullable List<ResultSearch> resultSearchList) {
-
+    updateUI(resultSearchList);
     }
 
     @Override

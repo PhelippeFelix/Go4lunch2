@@ -17,9 +17,9 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListViewHolder
     private List<ResultDetails> mResultDetails;
     private String mLocation;
 
-    public ListRecyclerViewAdapter(List<ResultDetails> items) {
+    public ListRecyclerViewAdapter(List<ResultDetails> items, String location) {
         mResultDetails = items;
-        mLocation = "-33.8670522,151.1957362";}
+        mLocation = location;}
 
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

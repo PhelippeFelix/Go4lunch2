@@ -2,6 +2,7 @@ package cfwz.skiti.go4lunch.ui.list;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,6 +25,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
+import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.model.GooglePlaces.Location;
 import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
 
@@ -66,11 +69,9 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
 
         // Display Name
         this.mNameRestaurant.setText(resultDetails.getName());
-        System.out.println(resultDetails);
 
         // Display Distance
         getDistance(location,resultDetails.getGeometry().getLocation());
-
         String distance = Integer.toString(Math.round(distanceResults[0]));
         this.mDistance.setText(itemView.getResources().getString(R.string.list_unit_distance, distance));
 
@@ -79,6 +80,7 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
 
         // Display Rating
         displayRating(resultDetails);
+
         // Display Opening Hours
         if (resultDetails.getOpeningHours() != null){
             if (resultDetails.getOpeningHours().getOpenNow().toString().equals("false")){
@@ -90,7 +92,22 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
             displayOpeningHour(OPENING_HOURS_NOT_KNOW,null);
         }
 
-
+        // Display Mates number & Icon
+        RestaurantsHelper.getTodayBooking(resultDetails.getPlaceId(),getTodayDate()).addOnCompleteListener(restaurantTask -> {
+            if (restaurantTask.isSuccessful()){
+                if (restaurantTask.getResult().size() > 0) {
+                    for (QueryDocumentSnapshot document : restaurantTask.getResult()) {
+                        Log.e("TAG", document.getId() + " => " + document.getData());
+                    }
+                    this.mWorkmateOnIt.setText(itemView.getResources().getString(R.string.restaurant_mates_number,restaurantTask.getResult().size()));
+                    this.mWorkmateImage.setImageResource(R.drawable.ic_perm_identity_black_24dp);
+                    this.mWorkmateImage.setVisibility(View.VISIBLE);
+                }else{
+                    this.mWorkmateOnIt.setText("");
+                    this.mWorkmateImage.setVisibility(View.GONE);
+                }
+            }
+        });
 
         // Display Photos
         if (!(resultDetails.getPhotos() == null)){
