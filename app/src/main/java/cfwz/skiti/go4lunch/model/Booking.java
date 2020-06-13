@@ -6,7 +6,7 @@ package cfwz.skiti.go4lunch.model;
 public class Booking {
     private String bookingDate;
     private String workmateUid;
-    private String restaurantPlaceId;
+    private String restaurantId;
     private String restaurantName;
 
     public Booking() {}
@@ -14,7 +14,7 @@ public class Booking {
     public Booking(String bookingDate, String workmateUid, String restaurantPlaceId, String restaurantName) {
         this.bookingDate = bookingDate;
         this.workmateUid = workmateUid;
-        this.restaurantPlaceId = restaurantPlaceId;
+        this.restaurantId = restaurantPlaceId;
         this.restaurantName = restaurantName; }
 
 
@@ -27,12 +27,12 @@ public class Booking {
     }
     public String getRestaurantName() { return restaurantName; }
     public String getRestaurantId() {
-        return restaurantPlaceId;
+        return restaurantId;
     }
 
     // SETTER
     public void setRestaurantId(String restaurantId) {
-        this.restaurantPlaceId = restaurantId;
+        this.restaurantId = restaurantId;
     }
     public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
     public void setUserId(String userId) { this.workmateUid = userId; }

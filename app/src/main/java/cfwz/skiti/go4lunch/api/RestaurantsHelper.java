@@ -53,7 +53,7 @@ public class RestaurantsHelper {
         }
 
         public static Task<QuerySnapshot> getTodayBooking(String restaurantPlaceId, String bookingDate){
-            return RestaurantsHelper.getBookingCollection().whereEqualTo("restaurantPlaceId", restaurantPlaceId).whereEqualTo("bookingDate", bookingDate).get();
+            return RestaurantsHelper.getBookingCollection().whereEqualTo("restaurantId", restaurantPlaceId).whereEqualTo("bookingDate", bookingDate).get();
         }
 
         public static Task<DocumentSnapshot> getLikeForThisRestaurant(String restaurantPlaceId){

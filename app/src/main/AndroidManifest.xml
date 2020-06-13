@@ -38,6 +38,9 @@
             android:name=".ui.map.MapFragment"
             android:label="@string/title_activity_map_fragment" />
         <activity
+            android:name=".ui.restaurant_profile.WebViewActivity"
+            android:label="WebView"/>
+        <activity
             android:name=".ui.restaurant_profile.ProfileActivity"
             android:label="@string/restaurant_name"/>
         <activity

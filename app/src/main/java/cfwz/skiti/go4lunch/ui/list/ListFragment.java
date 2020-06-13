@@ -12,38 +12,36 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
 import cfwz.skiti.go4lunch.model.GooglePlaces.ResultSearch;
-import cfwz.skiti.go4lunch.stream.GoogleApi;
 import cfwz.skiti.go4lunch.stream.GooglePlaceDetailsCalls;
 import cfwz.skiti.go4lunch.stream.GooglePlaceSearchCalls;
 import cfwz.skiti.go4lunch.ui.map.MapViewModel;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
 import cfwz.skiti.go4lunch.utils.BaseFragment;
 import cfwz.skiti.go4lunch.utils.ItemClickSupport;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls.Callbacks, GooglePlaceDetailsCalls.Callbacks, LocationListener {
 
+    private static final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private RecyclerView mRecyclerView;
     private List<ResultDetails> mResultDetailsList = new ArrayList<>();
     private List<ResultSearch> mSearchList = new ArrayList<>();
     private ListRecyclerViewAdapter mViewAdapter;
     private MapViewModel mViewModel;
+    private String mLocation;
 
 
 
@@ -63,21 +61,21 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         Context context = view.getContext();
+        mLocation = mViewModel.getCurrentUserPositionFormatted();
         mRecyclerView = (RecyclerView) view;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        updateList();
+        updateList(mLocation);
         return view;
     }
 
-    private void updateList() {
-        GooglePlaceSearchCalls.fetchNearbyRestaurants(this, mViewModel.getCurrentUserPositionFormatted());
+    private void updateList(String location) {
+        GooglePlaceSearchCalls.fetchNearbyRestaurants(this, location);
     }
 
     private void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_restaurant_object_list)
                 .setOnItemClickListener((recyclerView, position, v) -> {
-
                     ResultDetails result = mViewAdapter.getRestaurantDetails(position);
                     Intent intent = new Intent(getActivity(), ProfileActivity.class);
                     intent.putExtra("PlaceDetailResult", result.getPlaceId());
@@ -93,12 +91,11 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
     @Override
     public void onResponse(@Nullable List<ResultSearch> resultSearchList) {
         this.mSearchList = resultSearchList;
-        assert resultSearchList != null;
         getPlaceDetails(resultSearchList);
     }
 
     private void getPlaceDetails(List<ResultSearch> resultSearchList) {
-        for (int i=0;i<resultSearchList.size()-1;i++)
+        for (int i=0;i<resultSearchList.size();i++)
         {
             GooglePlaceDetailsCalls.fetchPlaceDetails(this, resultSearchList.get(i).getPlaceId());
         }
@@ -117,7 +114,19 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
 
     @Override
     public void onLocationChanged(Location location) {
-        updateList();
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+
+        this.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
+
+    }
+
+    public boolean checkLocationPermission() {
+        if (EasyPermissions.hasPermissions(getContext(), perms)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -127,11 +136,11 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
 
     @Override
     public void onProviderEnabled(String s) {
-
+        System.out.println("EEEEEEEEEEEEEEEEEE");
     }
 
     @Override
     public void onProviderDisabled(String s) {
-
+        System.out.println("DDDDDDDDDDDDDDDDD");
     }
 }

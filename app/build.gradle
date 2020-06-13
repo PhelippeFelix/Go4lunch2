@@ -69,6 +69,9 @@ dependencies {
     //Facebook
     implementation 'com.facebook.android:facebook-android-sdk:4.42.0'
 
+    //Image by url
+    implementation 'com.squareup.picasso:picasso:(insert latest version)'
+
 
     //FireBase UI
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'

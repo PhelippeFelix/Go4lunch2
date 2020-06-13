@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
@@ -11,82 +12,148 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         tools:srcCompat="@drawable/carte"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"
+        tools:ignore="MissingConstraints" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="@color/colorPrimary"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/imageView"
-        android:id="@+id/test1213">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:padding="10dp">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/restaurant_name"
-                android:textColor="@color/colorWhite"
-                android:textSize="20dp" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_favorite_off_black_24dp" />
-        </LinearLayout>
-
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:text="@string/restaurant_address"
-            android:layout_marginBottom="20dp"
-            android:textSize="16dp"
-            android:textColor="@color/colorWhite"
-            android:paddingLeft="10dp"/>
-    </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:background="@color/colorGreen"
-        app:layout_constraintTop_toTopOf="@id/test1213"
-        app:layout_constraintRight_toRightOf="@id/test1213"
-        android:layout_marginTop="-50dp"/>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:background="?android:attr/windowBackground"
-        app:layout_constraintLeft_toLeftOf="@id/test1213"
-        app:layout_constraintRight_toRightOf="@id/test1213"
-        app:menu="@menu/activity_restaurant_profile_bottom_nav"
-        app:layout_constraintTop_toBottomOf="@id/test1213"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:backgroundTint="@color/colorWhite"
+        android:clickable="true"
+        app:layout_constraintTop_toBottomOf="@id/imageView"
+        app:layout_constraintBottom_toBottomOf="@id/imageView"
+        app:layout_constraintEnd_toEndOf="parent"
         />
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/list_workmates_profile"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/restaurant_info"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="450dp"
-        app:layout_constraintTop_toBottomOf="@id/nav_view"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@+id/imageView">
+
+        <TextView
+            android:id="@+id/restaurant_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="200dp"
+            android:ellipsize="end"
+            android:layout_margin="@dimen/margin_to_parent"
+            android:textColor="@color/colorWhite"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RatingBar
+            android:id="@+id/item_ratingBar"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_to_parent"
+            android:numStars="3"
+            android:theme="@style/RatingBar"
+            app:layout_constraintStart_toEndOf="@id/restaurant_name"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/restaurant_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="200dp"
+            android:ellipsize="end"
+            android:layout_margin="@dimen/margin_to_parent"
+            android:textColor="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/restaurant_name" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/restaurant_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_info"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         >
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list_workmates"
-            android:name="skiti.cfwz.go4lunch.ui.restaurant_profile.ProfileActivity"
+        <Button
+            android:id="@+id/restaurant_item_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableTop="@drawable/ic_call_24dp"
+            android:drawableTint="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/restaurant_item_like"
+            app:layout_constraintBottom_toBottomOf="@id/restaurant_item_like"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="@string/call_option"
+            android:textColor="@color/colorPrimary" />
+
+        <Button
+            android:id="@+id/restaurant_item_like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableTop="@drawable/ic_star_24dp"
+            android:drawableTint="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:textColor="@color/colorPrimary"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/restaurant_item_website"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableTop="@drawable/ic_public_24dp"
+            android:drawableTint="@color/colorPrimary"
+            app:layout_constraintStart_toEndOf="@string/like_option"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/restaurant_item_like"
+            app:layout_constraintBottom_toBottomOf="@id/restaurant_item_like"
+            android:paddingBottom="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="@string/website_option"
+            android:textColor="@color/colorPrimary" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/restaurant_list_item"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_actions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            app:layoutManager="LinearLayoutManager"
-            tools:context=".utils.MainActivity"
-            tools:listitem="@layout/fragment_workmates_object_list" />
-    </androidx.core.widget.NestedScrollView>
+            android:layout_height="0.2dp"
+            android:background="@color/colorDivider"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/restaurant_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

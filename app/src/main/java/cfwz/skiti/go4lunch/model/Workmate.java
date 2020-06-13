@@ -12,7 +12,6 @@ public class Workmate {
     private String uid;
     private @Nullable String urlPicture;
     private String name;
-    private String restaurant;
 
     public Workmate() {}
 
@@ -27,12 +26,10 @@ public class Workmate {
     @Nullable
     public String getUrlPicture() { return urlPicture; }
     public String getName() { return name; }
-    public String getRestaurant() { return restaurant; }
 
 
     //SETTER
     public void setUid(String uid) { this.uid = uid; }
     public void setUrlPicture(@Nullable String urlPicture) { this.urlPicture = urlPicture; }
     public void setName(String name) { this.name = name; }
-    public void setRestaurant(String restaurant) { this.restaurant = restaurant; }
 }

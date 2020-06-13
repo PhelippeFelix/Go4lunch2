@@ -7,11 +7,15 @@
     <string name="menu_lunch">YOUR LUNCH</string>
     <string name="menu_settings">SETTINGS</string>
     <string name="menu_logout">LOGOUT</string>
+    <string name="toolbar_search_title">Search restaurants</string>
+    <string name="toolbar_search_hint">Search</string>
+
 
     <string name="restaurant_name">Name Of The Restaurant</string>
     <string name="restaurant_address">address of the restaurant</string>
     <string name="call_option">CALL</string>
     <string name="like_option">LIKE</string>
+    <string name="unlike_option">UNLIKE</string>
     <string name="website_option">WEBSITE</string>
     <string name="friend_restaurant">Scarlett is joining</string>
 
@@ -81,4 +85,17 @@
     <string name="check_box_is_mentor">Etes-vous un mentor ?</string>
     <string name="title_activity_map_fragment">Map</string>
     <string name="title_activity_maps">Map</string>
+    <string name="popup_title_perm_access">This application need permissions to work correctly.</string>
+    <string name="search_too_short">Your query must be 3 character length minimum</string>
+    <string name="restaurant_detail_recyclerview">%1$s is joining!</string>
+    <string name="restaurant_detail_no_phone">No phone number available</string>
+    <string name="restaurant_detail_no_website">No website available</string>
+    <string name="restaurant_error_retrieving_info">Unable to retrieve some user information</string>
+    <string name="restaurant_new_booking">You have booked a new restaurant for today!</string>
+    <string name="restaurant_change_booking">You have change your booked restaurant for today!</string>
+    <string name="restaurant_cancel_booking">You canceled your reservation for this restaurant!</string>
+    <string name="restaurant_like_ok">You liked this restaurant!</string>
+    <string name="restaurant_like_ko">Error, please try again later</string>
+    <string name="restaurant_dislike_ok">You dislike this restaurant!</string>
+    <string name="drawer_no_restaurant_booked">You don\\\'t booked any restaurant for today!</string>
 </resources>

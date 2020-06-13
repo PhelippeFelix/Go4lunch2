@@ -24,6 +24,8 @@ public class UserHelper {
         // --- CREATE ---
 
         public static Task<Void> createWorkmate(String uid, @Nullable String urlPicture, String name) {
+            if (urlPicture ==null)
+                urlPicture = "https://revuelespritlibre.org/sites/revuelespritlibre.org/files/portraits/userportrait.jpg";
             Workmate workmateToCreate = new Workmate(uid,urlPicture, name);
             return UserHelper.getWorkmatesCollection().document(uid).set(workmateToCreate);
         }
@@ -32,16 +34,4 @@ public class UserHelper {
 
         public static Task<DocumentSnapshot> getWorkmate(String uid){
             return UserHelper.getWorkmatesCollection().document(uid).get(); }
-
-
-        // --- UPDATE ---
-
-        public static Task<Void> updateRestaurant(String restaurant, String uid) {
-            return UserHelper.getWorkmatesCollection().document(uid).update("restaurant", restaurant);
-        }
-
-        public static Task<Void> updateFavorite(ArrayList<String>favorite, String uid){
-            return UserHelper.getWorkmatesCollection().document(uid).update("favorite",favorite);
-        }
-
 }

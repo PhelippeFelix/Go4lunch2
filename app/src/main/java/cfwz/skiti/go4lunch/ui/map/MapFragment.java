@@ -3,16 +3,25 @@ package cfwz.skiti.go4lunch.ui.map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApi;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
@@ -28,6 +37,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,21 +45,27 @@ import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.model.GooglePlaces.SearchPlace;
-import cfwz.skiti.go4lunch.stream.GoogleApi;
+import cfwz.skiti.go4lunch.stream.GooglePlaceSearch;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
 import cfwz.skiti.go4lunch.utils.BaseFragment;
+import cfwz.skiti.go4lunch.utils.MainActivity;
 import pub.devrel.easypermissions.EasyPermissions;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
 import cfwz.skiti.go4lunch.model.GooglePlaces.ResultSearch;
 import cfwz.skiti.go4lunch.stream.GooglePlaceDetailsCalls;
 import cfwz.skiti.go4lunch.stream.GooglePlaceSearchCalls;
 
-public class MapFragment extends BaseFragment implements LocationListener, GooglePlaceDetailsCalls.Callbacks, GooglePlaceSearchCalls.Callbacks {
+public class MapFragment extends BaseFragment implements LocationListener, GooglePlaceDetailsCalls.Callbacks, GooglePlaceSearchCalls.Callbacks,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     @BindView(R.id.map) MapView mMapView;
     private static final int PERMS_FINE_COARSE_LOCATION = 100;
@@ -58,7 +74,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     public static final String SEARCH_TYPE = "restaurant";
 
     private GoogleMap googleMap;
-    private GoogleApi mGoogleApiClient;
+    private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
@@ -66,19 +82,74 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
 
 
 
+    public static MapFragment newInstance() {
+        return new MapFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mViewModel = ViewModelProviders.of(getActivity()).get(MapViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-            super.onCreate(savedInstanceState);
+        ButterKnife.bind(this, view);
+        setHasOptionsMenu(true);
+        mViewModel.currentUserPosition.observe(getViewLifecycleOwner(), latLng -> {
+            GooglePlaceSearchCalls.fetchNearbyRestaurants(this,mViewModel.getCurrentUserPositionFormatted());
+        });
+
+        mMapView.onCreate(savedInstanceState);
+        mMapView.onResume();
+        this.configureMapView();
+        this.configureGoogleApiClient();
+        this.configureLocationRequest();
+        this.configureLocationCallBack();
 
             return view;
         }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.activity_main_appbar, menu);
+
+        SearchManager searchManager = (SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE);
+
+        MenuItem item = menu.findItem(R.id.menu_activity_main_search);
+        SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        item.setActionView(searchView);
+        searchView.setQueryHint(getResources().getString(R.string.toolbar_search_hint));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(((MainActivity) getContext()).getComponentName()));
+
+        searchView.setIconifiedByDefault(false);// Do not iconify the widget; expand it by default
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.length() > 2 ){
+                    //GoogleAutocomplete REquest
+
+                }else{
+                    Toast.makeText(getContext(), getResources().getString(R.string.search_too_short), Toast.LENGTH_LONG).show();
+                }
+                return true;
+
+            }
+            @Override
+            public boolean onQueryTextChange(String query) {
+                if (query.length() > 2){
+                    // GOOGLE AUTOCOMPLETE REQUEST
+
+                }
+                return false;
+            }
+        });
+    }
 
     private void configureMapView() {
         try {
@@ -108,8 +179,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     }
     private void updateUI(List<ResultSearch> results){
         googleMap.clear();
-        if(results instanceof ResultSearch){
-            Log.e(TAG, "updateUI: " + results.size());
+        Log.e(TAG, "updateUI: " + results.size());
             if (results.size() > 0){
                 for (int i = 0; i < results.size(); i++) {
                     int CurrentObject = i;
@@ -136,7 +206,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                 Toast.makeText(getContext(), getResources().getString(R.string.no_restaurant_error_message), Toast.LENGTH_SHORT).show();
             }
         }
-    }
 
     private void handleNewLocation(Location location) {
         Log.e(TAG, "handleNewLocation: " );
@@ -144,6 +213,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         double currentLongitude = location.getLongitude();
 
         this.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
+        this.mViewModel.updateCurrentUserZoom(15);
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.mViewModel.getCurrentUserPosition()));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(this.mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
@@ -230,6 +300,90 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
 
     @Override
     public void onFailure() {
+
+    }
+
+    private void configureGoogleApiClient(){
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(getContext())
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .enableAutoManage(getActivity(), this)
+                .build();
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (EasyPermissions.hasPermissions(getContext(), perms)) {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                handleNewLocation(location);
+                            } else {
+                                if (EasyPermissions.hasPermissions(getContext(), perms)) {
+                                    mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+                                }
+
+                            }
+                        }
+                    });
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, getString(R.string.popup_title_perm_access),
+                    PERMS_FINE_COARSE_LOCATION, perms);
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mMapView.onResume();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect(); }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMapView.onPause();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+            mGoogleApiClient.stopAutoManage(getActivity());
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mViewModel.currentUserPosition.removeObservers(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMapView.onLowMemory();
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 }

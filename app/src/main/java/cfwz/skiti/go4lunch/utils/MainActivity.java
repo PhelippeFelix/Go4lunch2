@@ -19,6 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,10 +34,18 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.viewpager.widget.ViewPager;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
+import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.ui.loggin.LogginActivity;
+import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
+import cfwz.skiti.go4lunch.ui.settings.SettingsActivity;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -167,15 +176,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
     }
-
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         //  Handle Navigation Item Click
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_lunch:
+                RestaurantsHelper.getBooking(getCurrentUser().getUid(),getTodayDate()).addOnCompleteListener(bookingTask -> {
+                    if (bookingTask.isSuccessful()){
+                        if (bookingTask.getResult().isEmpty()){
+                            Toast.makeText(this, getResources().getString(R.string.drawer_no_restaurant_booked), Toast.LENGTH_SHORT).show();
+                        }else{
+                            Map<String,Object> extra = new HashMap<>();
+                            for (QueryDocumentSnapshot booking : bookingTask.getResult()){
+                                extra.put("PlaceDetailResult",booking.getData().get("restaurantId"));
+                            }
+                            Intent intent = new Intent(this, ProfileActivity.class);
+                                for (Object key : extra.keySet()) {
+                                    String mKey = (String)key;
+                                    String value = (String) extra.get(key);
+                                    intent.putExtra(mKey, value);
+                                }
+                            startActivity(intent);
+                        }
+                    }
+                });
+                break;
             case R.id.nav_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
             case R.id.nav_logout:
                 this.signOutUserFromFirebase();
             default:
@@ -184,10 +214,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
     // --------------------
     // REST REQUESTS
     // --------------------
     // 1 - Create http requests (SignOut & Delete)
+
+    protected String getTodayDate(){
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        return df.format(c.getTime());
+    }
 
     private void signOutUserFromFirebase(){
         AuthUI.getInstance()

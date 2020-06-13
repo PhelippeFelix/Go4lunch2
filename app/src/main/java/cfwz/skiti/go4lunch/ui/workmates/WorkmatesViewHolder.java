@@ -35,10 +35,10 @@ public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
 
     public void updateWithData(Workmate results){
         RequestManager glide = Glide.with(itemView);
-        if (!(results.getUrlPicture() == null)){
+        if (results.getUrlPicture() != null){
             glide.load(results.getUrlPicture()).apply(RequestOptions.circleCropTransform()).into(mWorkmateAvatar);
         }else{
-            glide.load(R.drawable.ic_no_image_available).apply(RequestOptions.circleCropTransform()).into(mWorkmateAvatar);
+            glide.load(R.drawable.ic_anon_user_48dp).apply(RequestOptions.circleCropTransform()).into(mWorkmateAvatar);
         }
         RestaurantsHelper.getBooking(results.getUid(), getTodayDate()).addOnCompleteListener(restaurantTask -> {
             if (restaurantTask.isSuccessful()){
