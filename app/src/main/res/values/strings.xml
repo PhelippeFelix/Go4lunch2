@@ -98,4 +98,7 @@
     <string name="restaurant_like_ko">Error, please try again later</string>
     <string name="restaurant_dislike_ok">You dislike this restaurant!</string>
     <string name="drawer_no_restaurant_booked">You don\\\'t booked any restaurant for today!</string>
+    <string name="notification_message_no_workmates">None</string>
+    <string name="notification_message_big">Here is a reminder of your choice for today : %1$s %2$s. Workmates participating : %3$s</string>
+    <string name="notification_message">Here is a reminder of your choice for today</string>
 </resources>

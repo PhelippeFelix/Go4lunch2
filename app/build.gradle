@@ -22,85 +22,85 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        apply plugin: 'com.android.application'
+        apply plugin: 'com.google.gms.google-services'
     }
-    apply plugin: 'com.android.application'
-    apply plugin: 'com.google.gms.google-services'
-}
 
-dependencies {
-    //FIREBASE
-    implementation 'com.google.firebase:firebase-analytics:17.4.1'
-    implementation 'com.google.firebase:firebase-auth:19.3.1'
-    implementation 'com.google.firebase:firebase-firestore:21.4.3'
-    implementation 'com.google.firebase:firebase-messaging:20.1.7'
-    implementation 'com.google.android.gms:play-services-auth:18.0.0'
+    dependencies {
+        //FIREBASE
+        implementation 'com.google.firebase:firebase-analytics:17.4.3'
+        implementation 'com.google.firebase:firebase-auth:19.3.1'
+        implementation 'com.google.firebase:firebase-firestore:21.4.3'
+        implementation 'com.google.firebase:firebase-messaging:20.2.0'
+        implementation 'com.google.android.gms:play-services-auth:18.0.0'
 
-    //Google
-    implementation 'com.google.android.libraries.places:places:2.2.0'
-    implementation "com.google.android.gms:play-services-maps:17.0.0"
-    implementation "com.google.android.gms:play-services-places:17.0.0"
-    implementation "com.google.android.gms:play-services-location:17.0.0"
-    implementation 'com.google.maps.android:android-maps-utils:0.4.4'
+        //Google
+        implementation 'com.google.android.libraries.places:places:2.3.0'
+        implementation "com.google.android.gms:play-services-maps:17.0.0"
+        implementation "com.google.android.gms:play-services-places:17.0.0"
+        implementation "com.google.android.gms:play-services-location:17.0.0"
+        implementation 'com.google.maps.android:android-maps-utils:0.4.4'
 
-    //JSON
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation  'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+        //JSON
+        implementation 'com.google.code.gson:gson:2.8.6'
+        implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+        implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
-    //FOR ROBOLECTRIC
-    testImplementation "org.robolectric:robolectric:4.2.1"
-    testImplementation "org.robolectric:shadows-support-v4:3.3.2"
-    testImplementation "org.robolectric:multidex:3.4.2"
+        //FOR ROBOLECTRIC
+        testImplementation "org.robolectric:robolectric:4.2.1"
+        testImplementation "org.robolectric:shadows-support-v4:3.3.2"
+        testImplementation "org.robolectric:multidex:3.4.2"
 
-    //GLIDE
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
-    implementation 'jp.wasabeef:glide-transformations:4.1.0'
+        //GLIDE
+        implementation 'com.github.bumptech.glide:glide:4.11.0'
+        annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+        implementation 'jp.wasabeef:glide-transformations:4.1.0'
 
-    //EASY PERMISSIONS
-    implementation 'pub.devrel:easypermissions:3.0.0'
+        //EASY PERMISSIONS
+        implementation 'pub.devrel:easypermissions:3.0.0'
 
-    // JODA TIME
-    implementation 'joda-time:joda-time:2.10'
+        // JODA TIME
+        implementation 'joda-time:joda-time:2.10'
 
-    // Include all the Twitter APIs
-    implementation 'com.twitter.sdk.android:twitter:3.1.1'
+        // Include all the Twitter APIs
+        implementation 'com.twitter.sdk.android:twitter:3.1.1'
 
-    //Facebook
-    implementation 'com.facebook.android:facebook-android-sdk:4.42.0'
+        //Facebook
+        implementation 'com.facebook.android:facebook-android-sdk:4.42.0'
 
-    //Image by url
-    implementation 'com.squareup.picasso:picasso:(insert latest version)'
+        //Image by url
+        implementation 'com.squareup.picasso:picasso:2.5.2'
 
 
-    //FireBase UI
-    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
-    implementation 'com.firebaseui:firebase-ui-firestore:3.1.3'
+        //FireBase UI
+        implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+        implementation 'com.firebaseui:firebase-ui-firestore:3.1.3'
 
-    //MultiDex errors
-    implementation 'androidx.multidex:multidex:2.0.1'
+        //MultiDex errors
+        implementation 'androidx.multidex:multidex:2.0.1'
 
-    //Coordinator layout errors
-    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
+        //Coordinator layout errors
+        implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
 
-    //Butterknife
-    implementation 'com.jakewharton:butterknife:10.0.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+        //Butterknife
+        implementation 'com.jakewharton:butterknife:10.2.1'
+        implementation 'com.google.android.gms:play-services-maps:17.0.0'
+        annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
 
-    //GLIDE
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+        //GLIDE
+        implementation 'com.github.bumptech.glide:glide:4.11.0'
+        annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
-    implementation 'androidx.navigation:navigation-fragment:2.2.2'
-    implementation 'androidx.navigation:navigation-ui:2.2.2'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        implementation 'androidx.appcompat:appcompat:1.1.0'
+        implementation 'com.google.android.material:material:1.1.0'
+        implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+        implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
+        implementation 'androidx.navigation:navigation-fragment:2.2.2'
+        implementation 'androidx.navigation:navigation-ui:2.2.2'
+        implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+        testImplementation 'junit:junit:4.12'
+        androidTestImplementation 'androidx.test:runner:1.2.0'
+        androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    }
 }

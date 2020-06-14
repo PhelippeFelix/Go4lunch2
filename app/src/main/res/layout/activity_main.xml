@@ -20,9 +20,7 @@
         android:elevation="@dimen/elevation_size"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/colorPrimaryDark"
-        app:theme="@style/ToolBarStyle"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:android="http://schemas.android.com/apk/res/android" />
+        app:theme="@style/ToolBarStyle" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"

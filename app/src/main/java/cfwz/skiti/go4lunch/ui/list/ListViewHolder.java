@@ -177,7 +177,6 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
                 String closeHour = resultDetails.getOpeningHours().getPeriods().get(i).getClose().getTime();
                 if (currentHour < Integer.parseInt(closeHour) || daysArray[day] < resultDetails.getOpeningHours().getPeriods().get(i).getClose().getDay()){
                     int timeDifference = Integer.parseInt(closeHour) - currentHour;
-                    //Log.e("TAG", "RestaurantName : " + results.getName() + " | CurrentHour : " + currentHour + " | CloseHour : " + Integer.parseInt(closeHour) + " | TimeDifference : " + timeDifference);
                     if (timeDifference <= 30 && daysArray[day] == resultDetails.getOpeningHours().getPeriods().get(i).getClose().getDay()){
                         displayOpeningHour(CLOSING_SOON, closeHour);
                     }else{

@@ -17,7 +17,7 @@ import retrofit2.Response;
 public class GoogleAutoCompleteCalls {
     static String apiKey = "AIzaSyBm5KR0R5LIAKLlQZoiodV6rbQ61iClmL4";
     static int radius = 1500;
-    static String types = "restaurant";
+    static String types = "establishment";
     static String language = "fr";
 
 
@@ -28,7 +28,7 @@ public class GoogleAutoCompleteCalls {
     }
 
     // 2 - Public method to start fetching users following by Jake Wharton
-    public static void fetchAutoCompleteResult(GoogleAutoCompleteCalls.Callbacks callbacks, String input, int sessiontoken, String location){
+    public static void fetchAutoCompleteResult(GoogleAutoCompleteCalls.Callbacks callbacks, String input, String location){
 
         // 2.1 - Create a weak reference to callback (avoid memory leaks)
         final WeakReference<GoogleAutoCompleteCalls.Callbacks> callbacksWeakReference = new WeakReference<GoogleAutoCompleteCalls.Callbacks>(callbacks);
@@ -37,7 +37,7 @@ public class GoogleAutoCompleteCalls {
         GoogleAutoComplete googleAutoComplete = GoogleAutoComplete.retrofit.create(GoogleAutoComplete.class);
 
         // 2.3 - Create the call on Github API
-        Call<AutoCompleteResult> call = googleAutoComplete.getAutoComplete(input,types,language,location,radius,apiKey,sessiontoken);
+        Call<AutoCompleteResult> call = googleAutoComplete.getAutoComplete(input,types,language,location,radius,apiKey);
         // 2.4 - Start the call
         call.enqueue(new Callback<AutoCompleteResult>() {
 

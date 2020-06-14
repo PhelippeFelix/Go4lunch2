@@ -22,8 +22,7 @@ public interface GoogleAutoComplete {
                                              @Query("language") String language,
                                              @Query("location") String location,
                                              @Query("radius") int radius,
-                                             @Query("key") String key,
-                                             @Query("sessiontoken") int sessiontoken);
+                                             @Query("key") String key);
 
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
