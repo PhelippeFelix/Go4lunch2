@@ -101,4 +101,7 @@
     <string name="notification_message_no_workmates">None</string>
     <string name="notification_message_big">Here is a reminder of your choice for today : %1$s %2$s. Workmates participating : %3$s</string>
     <string name="notification_message">Here is a reminder of your choice for today</string>
+    <string name="settings_save_text">Save</string>
+    <string name="settings_notification_title">Notifications</string>
+    <string name="settings_save_ok">Settings saved!</string>
 </resources>

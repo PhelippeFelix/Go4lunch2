@@ -17,8 +17,6 @@ public class Booking {
         this.restaurantId = restaurantPlaceId;
         this.restaurantName = restaurantName; }
 
-
-    // GETTER
     public String getBookingDate() {
         return bookingDate;
     }
@@ -30,7 +28,6 @@ public class Booking {
         return restaurantId;
     }
 
-    // SETTER
     public void setRestaurantId(String restaurantId) {
         this.restaurantId = restaurantId;
     }

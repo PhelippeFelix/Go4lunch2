@@ -19,9 +19,6 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -32,17 +29,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.xml.transform.Result;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cfwz.skiti.go4lunch.BuildConfig;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.api.UserHelper;
-import cfwz.skiti.go4lunch.model.GooglePlaces.PlaceDetails;
-import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
 import cfwz.skiti.go4lunch.model.Workmate;
-import cfwz.skiti.go4lunch.stream.GooglePlaceDetailsCalls;
-import cfwz.skiti.go4lunch.utils.MainActivity;
+import cfwz.skiti.go4lunch.api.GooglePlaceDetailsCalls;
+import cfwz.skiti.go4lunch.ui.MainActivity;
 import cfwz.skiti.go4lunch.R;
 
 import static cfwz.skiti.go4lunch.ui.list.ListViewHolder.BASE_URL;
@@ -51,9 +46,6 @@ import static cfwz.skiti.go4lunch.ui.list.ListViewHolder.MAX_RATING;
 import static cfwz.skiti.go4lunch.ui.list.ListViewHolder.MAX_STAR;
 import static cfwz.skiti.go4lunch.ui.list.ListViewHolder.MAX_WIDTH;
 
-/**
- * Created by Skiti on 04/03/2020
- */
 
 public class ProfileActivity extends MainActivity implements View.OnClickListener, GooglePlaceDetailsCalls.Callbacks {
     @Nullable @BindView(R.id.restaurant_name) TextView mRestaurantName;
@@ -67,7 +59,6 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
     @Nullable @BindView(R.id.item_ratingBar) RatingBar mRatingBar;
 
     private ResultDetails requestResult;
-
     private List<Workmate> mWorkmates = new ArrayList<>();
     private ProfileAdapter mProfileAdapter;
 
@@ -77,22 +68,17 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
         setContentView(R.layout.activity_restaurant_profile);
         ButterKnife.bind(this);
 
-
         this.setFloatingActionButtonOnClickListener();
         this.configureButtonClickListener();
         this.configureRecyclerView();
         this.retrieveObject();
     }
 
-    // -----------------
-    // CONFIGURATION
-    // -----------------
-
     private void checkIfUserLikeThisRestaurant(){
         RestaurantsHelper.getAllLikeByUserId(getCurrentUser().getUid()).addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 Log.e("TAG", "checkIfUserLikeThisRestaurant: " + task.getResult().getDocuments());
-                if (task.getResult().isEmpty()){ // User don't like any restaurant
+                if (task.getResult().isEmpty()){
                     mButtonLike.setText(getResources().getString(R.string.like_option));
                 }else{
                     for (DocumentSnapshot restaurant : task.getResult()){
@@ -106,10 +92,8 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
                 }
             }
         });
-
     }
 
-    // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView(){
         this.mProfileAdapter = new ProfileAdapter(this.mWorkmates);
         this.mRestaurantRecyclerView.setAdapter(this.mProfileAdapter);
@@ -144,7 +128,6 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
                     Toast.makeText(this, getResources().getString(R.string.restaurant_detail_no_phone), Toast.LENGTH_SHORT).show();
                 }
                 break;
-
             case R.id.restaurant_item_like:
                 if (mButtonLike.getText().equals(getResources().getString(R.string.like_option))){
                     this.likeThisRestaurant();
@@ -152,7 +135,6 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
                     this.dislikeThisRestaurant();
                 }
                 break;
-
             case R.id.restaurant_item_website:
                 if (requestResult.getWebsite() != null){
                     Intent intent = new Intent(this,WebViewActivity.class);
@@ -165,10 +147,6 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
         }
     }
 
-    // -------------------
-    // UPDATE UI
-    // -------------------
-
     private void updateUI(ResultDetails results){
             if (getCurrentUser() != null){
                 this.checkIfUserAlreadyBookedRestaurant(getCurrentUser().getUid(),requestResult.getPlaceId(),requestResult.getName(),false);
@@ -178,7 +156,7 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
                 this.displayFAB((R.drawable.ic_check_circle_black_24dp),getResources().getColor(R.color.colorGreen));
                 Toast.makeText(this, getResources().getString(R.string.restaurant_error_retrieving_info), Toast.LENGTH_SHORT).show();
             }
-            Picasso.with(this).load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+results.getPhotos().get(0).getPhotoReference()+"&key="+ "AIzaSyBm5KR0R5LIAKLlQZoiodV6rbQ61iClmL4").into(mImageView);
+            Picasso.with(this).load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+results.getPhotos().get(0).getPhotoReference()+"&key="+ BuildConfig.google_api_key).into(mImageView);
             mRestaurantName.setText(results.getName());
             mRestaurantAddress.setText(results.getVicinity());
             this.displayRating(results);
@@ -210,10 +188,6 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
             }
         });
     }
-
-    // --------------------
-    // REST REQUEST
-    // --------------------
 
     private void likeThisRestaurant(){
         if (requestResult != null && getCurrentUser() != null){
@@ -249,24 +223,18 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
         }
     }
 
-    // ---------------------------------
-    // PROCESS TO BOOK A RESTAURANT
-    // ---------------------------------
-
     private void checkIfUserAlreadyBookedRestaurant(String userId, String restaurantId, String restaurantName, Boolean tryingToBook){
         RestaurantsHelper.getBooking(userId, getTodayDate()).addOnCompleteListener(restaurantTask -> {
             if (restaurantTask.isSuccessful()){
-                if (restaurantTask.getResult().size() == 1){ // User already booked a restaurant today
-
+                if (restaurantTask.getResult().size() == 1){
                     for (QueryDocumentSnapshot restaurant : restaurantTask.getResult()) {
-                        if (restaurant.getData().get("restaurantName").equals(restaurantName)){ // If booked restaurant is the same as restaurant we are trying to book
+                        if (restaurant.getData().get("restaurantName").equals(restaurantName)){
                             this.displayFAB((R.drawable.ic_clear_black_24dp),getResources().getColor(R.color.colorError));
                             if (tryingToBook){
                                 this.manageBooking(userId, restaurantId, restaurantName,restaurant.getId(),false,false,true);
                                 Toast.makeText(this, getResources().getString(R.string.restaurant_cancel_booking), Toast.LENGTH_SHORT).show();
                             }
-
-                        }else{ // If user is trying to book an other restaurant for today
+                        }else{
                             this.displayFAB((R.drawable.ic_check_circle_black_24dp),getResources().getColor(R.color.colorGreen));
                             if (tryingToBook){
                                 this.manageBooking(userId, restaurantId, restaurantName,restaurant.getId(),false,true,false);
@@ -274,8 +242,7 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
                             }
                         }
                     }
-
-                }else{ // No restaurant booked for this user today
+                }else{
                     this.displayFAB((R.drawable.ic_check_circle_black_24dp),getResources().getColor(R.color.colorGreen));
                     if (tryingToBook){
                         this.manageBooking(userId, restaurantId, restaurantName,null,true,false,false);
@@ -298,7 +265,6 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
             RestaurantsHelper.deleteBooking(bookingId);
             this.displayFAB((R.drawable.ic_check_circle_black_24dp),getResources().getColor(R.color.colorGreen));
         }
-
         updateUIWithRecyclerView(requestResult.getPlaceId());
     }
 
@@ -332,8 +298,6 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
     }
 
     @Override
-    public void onFailure() {
-
-    }
+    public void onFailure() { }
 }
 

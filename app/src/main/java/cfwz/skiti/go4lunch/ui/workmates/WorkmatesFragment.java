@@ -10,21 +10,17 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,9 +30,8 @@ import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.api.UserHelper;
 import cfwz.skiti.go4lunch.model.Workmate;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
-import cfwz.skiti.go4lunch.utils.BaseFragment;
+import cfwz.skiti.go4lunch.ui.BaseFragment;
 import cfwz.skiti.go4lunch.utils.ItemClickSupport;
-import cfwz.skiti.go4lunch.utils.MainActivity;
 
 import static com.firebase.ui.auth.ui.email.EmailLinkFragment.TAG;
 

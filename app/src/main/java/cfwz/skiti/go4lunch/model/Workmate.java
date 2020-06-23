@@ -12,24 +12,26 @@ public class Workmate {
     private String uid;
     private @Nullable String urlPicture;
     private String name;
+    @Nullable private boolean notification;
+
 
     public Workmate() {}
 
     public Workmate(String uid,@Nullable String urlPicture, String name) {
         this.uid = uid;
         this.urlPicture = urlPicture;
-        this.name = name; }
+        this.name = name;
+        this.notification = false;}
 
-
-    //GETTER
     public String getUid() { return uid; }
     @Nullable
     public String getUrlPicture() { return urlPicture; }
     public String getName() { return name; }
+    @Nullable
+    public boolean isNotification() { return notification; }
 
-
-    //SETTER
     public void setUid(String uid) { this.uid = uid; }
     public void setUrlPicture(@Nullable String urlPicture) { this.urlPicture = urlPicture; }
     public void setName(String name) { this.name = name; }
+    public void setNotification(boolean notification) { this.notification = notification; }
 }

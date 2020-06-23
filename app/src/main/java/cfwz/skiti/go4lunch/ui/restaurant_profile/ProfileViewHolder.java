@@ -15,9 +15,6 @@ import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.model.Workmate;
 
-/**
- * Created by Skiti on 12/06/2020
- */
 
 public class ProfileViewHolder  extends RecyclerView.ViewHolder {
         @BindView(R.id.detail_main_picture) ImageView mImageView;
@@ -35,7 +32,6 @@ public class ProfileViewHolder  extends RecyclerView.ViewHolder {
             }else{
                 glide.load(R.drawable.ic_anon_user_48dp).apply(RequestOptions.circleCropTransform()).into(mImageView);
             }
-
             this.mTextView.setText(itemView.getResources().getString(R.string.restaurant_detail_recyclerview, results.getName()));
             this.changeTextColor(R.color.colorBlack);
         }

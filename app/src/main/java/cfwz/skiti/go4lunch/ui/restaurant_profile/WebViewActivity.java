@@ -13,30 +13,22 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
 
-/**
- * Created by Skiti on 12/06/2020
- */
 
 public class WebViewActivity extends AppCompatActivity {
-
     @BindView(R.id.simple_toolbar) Toolbar mToolbar;
     @BindView(R.id.webview_swipe_refresh) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.webview) WebView mWebView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         ButterKnife.bind(this);
-
         this.configureToolbar();
         this.displayWebView();
         this.configureSwipeRefreshLayout();
     }
-
-    // -------------
-    // CONFIGURATION
-    // -------------
 
     private void configureToolbar(){
         setSupportActionBar(mToolbar);
@@ -47,10 +39,6 @@ public class WebViewActivity extends AppCompatActivity {
     private void configureSwipeRefreshLayout(){
         mSwipeRefreshLayout.setOnRefreshListener(this::displayWebView);
     }
-
-    // -------------
-    // ACTION
-    // -------------
 
     private void displayWebView(){
         String url = getIntent().getStringExtra("Website");
@@ -63,6 +51,5 @@ public class WebViewActivity extends AppCompatActivity {
         }else{
             mSwipeRefreshLayout.setRefreshing(false);
         }
-
     }
 }

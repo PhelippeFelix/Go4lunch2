@@ -24,11 +24,13 @@ import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.UserHelper;
 
-/**
- * Created by Skiti on 02/03/2020
- */
 
 public class LogginActivity extends Activity {
+    @BindView(R.id.log_activity_coordinator_layout) CoordinatorLayout coordinatorLayout;
+
+    private static final int RC_SIGN_IN = 123;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,22 +39,6 @@ public class LogginActivity extends Activity {
         this.startSignInActivity();
     }
 
-    //FOR DATA
-    // 1 - Identifier for Sign-In Activity
-    private static final int RC_SIGN_IN = 123;
-
-    //FOR DESIGN
-    // 1 - Get Coordinator Layout
-    @BindView(R.id.log_activity_coordinator_layout) CoordinatorLayout coordinatorLayout;
-
-    // --------------------
-    // ACTIONS
-    // --------------------
-    // --------------------
-    // NAVIGATION
-    // --------------------
-
-    // 2 - Launch Sign-In Activity
     private void startSignInActivity(){
         startActivityForResult(
                 AuthUI.getInstance()
@@ -70,33 +56,20 @@ public class LogginActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // 4 - Handle SignIn Activity response on activity result
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
-    // --------------------
-    // UI
-    // --------------------
-
-    // 2 - Show Snack Bar with a message
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
-    // --------------------
-    // UTILS
-    // --------------------
-
-    // 3 - Method that handles response after SignIn Activity close
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-
         IdpResponse response = IdpResponse.fromResultIntent(data);
-
         if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) { // SUCCESS
+            if (resultCode == RESULT_OK) {
                 this.createWorkmate();
                 this.finish();
-            } else { // ERRORS
+            } else {
                 if (response == null) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
                 } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
@@ -127,7 +100,7 @@ public class LogginActivity extends Activity {
             String uid = this.getCurrentUser().getUid();
             UserHelper.createWorkmate(uid,urlPicture, name).addOnFailureListener(this.onFailureListener());
         }
-    }
+      }
     }
 
 

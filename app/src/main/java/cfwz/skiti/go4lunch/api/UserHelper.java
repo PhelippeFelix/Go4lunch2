@@ -7,12 +7,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
-
 import cfwz.skiti.go4lunch.model.Workmate;
 
-public class UserHelper {
 
+public class UserHelper {
         private static final String COLLECTION_NAME = "Workmates";
 
         // --- COLLECTION REFERENCE ---
@@ -34,4 +32,10 @@ public class UserHelper {
 
         public static Task<DocumentSnapshot> getWorkmate(String uid){
             return UserHelper.getWorkmatesCollection().document(uid).get(); }
+
+        // --- UPDATE ---
+
+    public static Task<Void> updateUserSettings(String userId,boolean notification){
+        return  UserHelper.getWorkmatesCollection().document(userId).update("notification",notification);
+    }
 }

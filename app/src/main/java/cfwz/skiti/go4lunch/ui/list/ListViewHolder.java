@@ -24,14 +24,12 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cfwz.skiti.go4lunch.BuildConfig;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
-import cfwz.skiti.go4lunch.model.GooglePlaces.Location;
-import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
+import cfwz.skiti.go4lunch.model.googleplaces.Location;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
 
-/**
- * Created by Skiti on 18/05/2020
- */
 
 public class ListViewHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.name_restaurant) public TextView mNameRestaurant;
@@ -47,15 +45,12 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
     private static final String CLOSED = "CLOSED";
     private static final String CLOSING_SOON = "CLOSING_SOON";
     private static final String OPENING_HOURS_NOT_KNOW = "OPENING_HOURS_NOT_KNOW";
-
     public static final String BASE_URL = "https://maps.googleapis.com/maps/api/place/photo";
     public static final int MAX_WIDTH = 75;
     public static final int MAX_HEIGHT = 75;
     public static final int MAX_HEIGHT_LARGE = 250;
-
     public static final double MAX_RATING = 5;
     public static final double MAX_STAR = 3;
-
     private static float[] distanceResults = new float[3];
 
 
@@ -67,21 +62,16 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
     public void updateWithData(ResultDetails resultDetails, String location) {
         RequestManager glide = Glide.with(itemView);
 
-        // Display Name
         this.mNameRestaurant.setText(resultDetails.getName());
 
-        // Display Distance
         getDistance(location,resultDetails.getGeometry().getLocation());
         String distance = Integer.toString(Math.round(distanceResults[0]));
         this.mDistance.setText(itemView.getResources().getString(R.string.list_unit_distance, distance));
 
-        // Display Address
         this.mAdressRestaurant.setText(getAddress(resultDetails));
 
-        // Display Rating
         displayRating(resultDetails);
 
-        // Display Opening Hours
         if (resultDetails.getOpeningHours() != null){
             if (resultDetails.getOpeningHours().getOpenNow().toString().equals("false")){
                 displayOpeningHour(CLOSED,null);
@@ -92,7 +82,6 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
             displayOpeningHour(OPENING_HOURS_NOT_KNOW,null);
         }
 
-        // Display Mates number & Icon
         RestaurantsHelper.getTodayBooking(resultDetails.getPlaceId(),getTodayDate()).addOnCompleteListener(restaurantTask -> {
             if (restaurantTask.isSuccessful()){
                 if (restaurantTask.getResult().size() > 0) {
@@ -109,16 +98,14 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
             }
         });
 
-        // Display Photos
         if (!(resultDetails.getPhotos() == null)){
             if (!(resultDetails.getPhotos().isEmpty())){
-                glide.load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+resultDetails.getPhotos().get(0).getPhotoReference()+"&key="+ "AIzaSyBm5KR0R5LIAKLlQZoiodV6rbQ61iClmL4").into(mAvatarRestaurant);
+                glide.load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+resultDetails.getPhotos().get(0).getPhotoReference()+"&key="+ BuildConfig.google_api_key).into(mAvatarRestaurant);
             }
         }else{
             glide.load(R.drawable.ic_no_image_available).apply(RequestOptions.centerCropTransform()).into(mAvatarRestaurant);
         }
     }
-
 
     private void displayRating(ResultDetails resultDetails){
         if (resultDetails.getRating() != null){

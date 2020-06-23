@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import cfwz.skiti.go4lunch.R;
-import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
+
 
 public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListViewHolder> {
-
     private List<ResultDetails> mResultDetails;
     private String mLocation;
 

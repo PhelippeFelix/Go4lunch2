@@ -17,6 +17,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,30 +29,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cfwz.skiti.go4lunch.R;
-import cfwz.skiti.go4lunch.model.AutoComplete.AutoCompleteResult;
-import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
-import cfwz.skiti.go4lunch.model.GooglePlaces.ResultSearch;
-import cfwz.skiti.go4lunch.model.GooglePlaces.SearchPlace;
-import cfwz.skiti.go4lunch.stream.GoogleAutoComplete;
-import cfwz.skiti.go4lunch.stream.GoogleAutoCompleteCalls;
-import cfwz.skiti.go4lunch.stream.GooglePlaceDetailsCalls;
-import cfwz.skiti.go4lunch.stream.GooglePlaceSearchCalls;
+import cfwz.skiti.go4lunch.model.autocomplete.AutoCompleteResult;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultSearch;
+import cfwz.skiti.go4lunch.api.GoogleAutoCompleteCalls;
+import cfwz.skiti.go4lunch.api.GooglePlaceDetailsCalls;
+import cfwz.skiti.go4lunch.api.GooglePlaceSearchCalls;
 import cfwz.skiti.go4lunch.ui.map.MapViewModel;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
-import cfwz.skiti.go4lunch.utils.BaseFragment;
+import cfwz.skiti.go4lunch.ui.BaseFragment;
 import cfwz.skiti.go4lunch.utils.ItemClickSupport;
-import cfwz.skiti.go4lunch.utils.MainActivity;
+import cfwz.skiti.go4lunch.ui.MainActivity;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls.Callbacks, GooglePlaceDetailsCalls.Callbacks, GoogleAutoCompleteCalls.Callbacks, LocationListener {
 
+public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls.Callbacks, GooglePlaceDetailsCalls.Callbacks, GoogleAutoCompleteCalls.Callbacks, LocationListener {
     private static final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private RecyclerView mRecyclerView;
     private List<ResultDetails> mResultDetailsList = new ArrayList<>();
     private ListRecyclerViewAdapter mViewAdapter;
     private MapViewModel mViewModel;
     private int resultSize;
-
 
 
     public static ListFragment newInstance() {
@@ -64,12 +62,12 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         mViewModel = ViewModelProviders.of(getActivity()).get(MapViewModel.class);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         Context context = view.getContext();
+        checkLocationPermission();
         mRecyclerView = (RecyclerView) view;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
@@ -97,18 +95,14 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-
         inflater.inflate(R.menu.activity_main_appbar, menu);
-
         SearchManager searchManager = (SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE);
-
         MenuItem item = menu.findItem(R.id.menu_activity_main_search);
         SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
         item.setActionView(searchView);
         searchView.setQueryHint(getResources().getString(R.string.toolbar_search_hint));
         searchView.setSearchableInfo(searchManager.getSearchableInfo(((MainActivity) getContext()).getComponentName()));
-
         searchView.setIconifiedByDefault(false);// Do not iconify the widget; expand it by default
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -126,23 +120,17 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
             public boolean onQueryTextChange(String query) {
                 if (query.length() > 2){
                     GoogleAutoCompleteSearch(query);
-                }else if (query.length() < 2){
+                }else if (query.length() == 0){
                     GooglePlaceSearch(mViewModel.getCurrentUserPositionFormatted());
                 }
                 return false;
             }
         });
-
     }
 
     private void GoogleAutoCompleteSearch(String query) {
         GoogleAutoCompleteCalls.fetchAutoCompleteResult(this,query,mViewModel.getCurrentUserPositionFormatted());
     }
-
-    /**
-     * Init the List of neighbours
-     */
-
 
     @Override
     public void onResponse(@Nullable List<ResultSearch> resultSearchList) {
@@ -151,14 +139,14 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
     }
 
     private void SearchToDetails(List<ResultSearch> resultSearchList) {
-        mResultDetailsList = new ArrayList<>();
+        mResultDetailsList.clear();
         for (int i=0;i<resultSearchList.size();i++){
             GooglePlaceDetailsCalls.fetchPlaceDetails(this,resultSearchList.get(i).getPlaceId());
         }
     }
 
     private void AutoCompleteToDetails(AutoCompleteResult autoCompleteResult) {
-        mResultDetailsList = new ArrayList<>();
+        mResultDetailsList.clear();
         for (int i=0;i<autoCompleteResult.getPredictions().size();i++)
         {
             GooglePlaceDetailsCalls.fetchPlaceDetails(this, autoCompleteResult.getPredictions().get(i).getPlaceId());
@@ -168,12 +156,11 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
     @Override
     public void onResponse(@Nullable ResultDetails resultDetails) {
         mResultDetailsList.add(resultDetails);
-        if (mResultDetailsList.size()==resultSize)mRecyclerView.setAdapter(new ListRecyclerViewAdapter(mResultDetailsList,mViewModel.getCurrentUserPositionFormatted()));
+        if (mResultDetailsList.size()==resultSize)configureRecyclerView();
     }
 
     @Override
     public void onResponse(@Nullable AutoCompleteResult autoCompleteResult) {
-        System.out.println("WERWERWERWERWERWRWER");
         resultSize = autoCompleteResult.getPredictions().size();
         AutoCompleteToDetails(autoCompleteResult);
     }
@@ -189,7 +176,6 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         double currentLongitude = location.getLongitude();
 
         this.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
-
     }
 
     public boolean checkLocationPermission() {
@@ -200,18 +186,18 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         }
     }
 
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
+    private void configureRecyclerView(){
+        this.mViewAdapter = new ListRecyclerViewAdapter(this.mResultDetailsList, mViewModel.getCurrentUserPositionFormatted());
+        this.mRecyclerView.setAdapter(this.mViewAdapter);
+        this.mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     @Override
-    public void onProviderEnabled(String s) {
-
-    }
+    public void onStatusChanged(String s, int i, Bundle bundle) { }
 
     @Override
-    public void onProviderDisabled(String s) {
+    public void onProviderEnabled(String s) { }
 
-    }
+    @Override
+    public void onProviderDisabled(String s) { }
 }

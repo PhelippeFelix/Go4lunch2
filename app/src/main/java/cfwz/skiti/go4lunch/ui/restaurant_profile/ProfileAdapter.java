@@ -12,15 +12,11 @@ import java.util.List;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.model.Workmate;
 
-/**
- * Created by Skiti on 12/06/2020
- */
 
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileViewHolder> {
-        // FOR DATA
         private List<Workmate> mWorkmates;
 
-        // CONSTRUCTOR
+
         public ProfileAdapter(List<Workmate> result) {
             this.mWorkmates = result;
         }

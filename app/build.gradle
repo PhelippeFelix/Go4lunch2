@@ -18,6 +18,9 @@ android {
         multiDexEnabled true
     }
     buildTypes {
+        buildTypes.each {
+            it.buildConfigField 'String', 'google_api_key', google_api_key
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -45,11 +48,6 @@ android {
         implementation 'com.google.code.gson:gson:2.8.6'
         implementation 'com.squareup.retrofit2:retrofit:2.3.0'
         implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-
-        //FOR ROBOLECTRIC
-        testImplementation "org.robolectric:robolectric:4.2.1"
-        testImplementation "org.robolectric:shadows-support-v4:3.3.2"
-        testImplementation "org.robolectric:multidex:3.4.2"
 
         //GLIDE
         implementation 'com.github.bumptech.glide:glide:4.11.0'

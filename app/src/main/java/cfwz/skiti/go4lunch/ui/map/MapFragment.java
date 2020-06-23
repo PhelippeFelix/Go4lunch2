@@ -20,7 +20,6 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -40,45 +39,37 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
-import cfwz.skiti.go4lunch.model.AutoComplete.AutoCompleteResult;
-import cfwz.skiti.go4lunch.model.GooglePlaces.PlaceDetails;
-import cfwz.skiti.go4lunch.model.GooglePlaces.SearchPlace;
-import cfwz.skiti.go4lunch.stream.GoogleAutoComplete;
-import cfwz.skiti.go4lunch.stream.GoogleAutoCompleteCalls;
-import cfwz.skiti.go4lunch.stream.GooglePlaceDetails;
-import cfwz.skiti.go4lunch.stream.GooglePlaceSearch;
+import cfwz.skiti.go4lunch.model.autocomplete.AutoCompleteResult;
+import cfwz.skiti.go4lunch.api.GoogleAutoCompleteCalls;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
-import cfwz.skiti.go4lunch.utils.BaseFragment;
-import cfwz.skiti.go4lunch.utils.MainActivity;
+import cfwz.skiti.go4lunch.ui.BaseFragment;
+import cfwz.skiti.go4lunch.ui.MainActivity;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import cfwz.skiti.go4lunch.R;
-import cfwz.skiti.go4lunch.model.GooglePlaces.ResultDetails;
-import cfwz.skiti.go4lunch.model.GooglePlaces.ResultSearch;
-import cfwz.skiti.go4lunch.stream.GooglePlaceDetailsCalls;
-import cfwz.skiti.go4lunch.stream.GooglePlaceSearchCalls;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultSearch;
+import cfwz.skiti.go4lunch.api.GooglePlaceDetailsCalls;
+import cfwz.skiti.go4lunch.api.GooglePlaceSearchCalls;
+
 
 public class MapFragment extends BaseFragment implements LocationListener, GooglePlaceDetailsCalls.Callbacks, GooglePlaceSearchCalls.Callbacks,GoogleApiClient.OnConnectionFailedListener, GoogleAutoCompleteCalls.Callbacks, GoogleApiClient.ConnectionCallbacks {
-
     @BindView(R.id.map) MapView mMapView;
     @BindView(R.id.fragment_map_floating_action_btn) FloatingActionButton mFloatingActionButton;
+
     private static final int PERMS_FINE_COARSE_LOCATION = 100;
     private static final String TAG = MapFragment.class.getSimpleName();
     private static final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-
     private GoogleMap googleMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -114,7 +105,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         this.configureGoogleApiClient();
         this.configureLocationRequest();
         this.configureLocationCallBack();
-
             return view;
         }
 
@@ -123,16 +113,13 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
         inflater.inflate(R.menu.activity_main_appbar, menu);
-
         SearchManager searchManager = (SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE);
-
         MenuItem item = menu.findItem(R.id.menu_activity_main_search);
         SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
         item.setActionView(searchView);
         searchView.setQueryHint(getResources().getString(R.string.toolbar_search_hint));
         searchView.setSearchableInfo(searchManager.getSearchableInfo(((MainActivity) getContext()).getComponentName()));
-
         searchView.setIconifiedByDefault(false);// Do not iconify the widget; expand it by default
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -143,7 +130,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                     Toast.makeText(getContext(), getResources().getString(R.string.search_too_short), Toast.LENGTH_LONG).show();
                 }
                 return true;
-
             }
             @Override
             public boolean onQueryTextChange(String query) {
@@ -172,25 +158,22 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
             e.printStackTrace();
         }
         mMapView.getMapAsync(new OnMapReadyCallback() {
-
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
                 if (checkLocationPermission()) {
-                    //Request location updates:
                     googleMap.setMyLocationEnabled(true);
                 }
                 googleMap.getUiSettings().setCompassEnabled(true);
                 googleMap.getUiSettings().setMyLocationButtonEnabled(true);
                 View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).
                         getParent()).findViewById(Integer.parseInt("2"));
-
-                // and next place it, for example, on bottom right (as Google Maps app)
                 googleMap.getUiSettings().setRotateGesturesEnabled(true);
                 googleMap.setOnMarkerClickListener(MapFragment.this::onClickMarker);
             }
         });
     }
+
     private void updateUI(List<ResultDetails> results){
         googleMap.clear();
         Log.e(TAG, "updateUI: " + results.size());
@@ -206,9 +189,9 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                             MarkerOptions markerOptions = new MarkerOptions();
                             markerOptions.position(new LatLng(lat, lng));
                             markerOptions.title(title);
-                            if (restaurantTask.getResult().isEmpty()) { // If there is no booking for today
+                            if (restaurantTask.getResult().isEmpty()) {
                                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.lunch_marker_nobody));
-                            } else { // If there is booking for today
+                            } else {
                                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.lunch_marker_someone_here));
                             }
                             Marker marker = googleMap.addMarker(markerOptions);
@@ -225,10 +208,8 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         Log.e(TAG, "handleNewLocation: " );
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
-
         this.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
         this.mViewModel.updateCurrentUserZoom(15);
-
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.mViewModel.getCurrentUserPosition()));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(this.mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
         stopLocationUpdates();
@@ -246,7 +227,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
 
     private void configureLocationRequest(){
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(100 * 1000)        // 100 seconds, in milliseconds
@@ -279,7 +259,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {googleMap.setMyLocationEnabled(true);}
     }
@@ -336,7 +315,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
 
     @Override
     public void onFailure() {
-
     }
 
     private void configureGoogleApiClient(){
@@ -361,7 +339,8 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                                 mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
                                     public void onClick(View v)
                                     {
-                                        handleNewLocation(location);
+                                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(mViewModel.getCurrentUserPosition()));
+                                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
                                     }
                                 });
                                 handleNewLocation(location);
@@ -374,16 +353,13 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                         }
                     });
         } else {
-            // Do not have permissions, request them now
             EasyPermissions.requestPermissions(this, getString(R.string.popup_title_perm_access),
                     PERMS_FINE_COARSE_LOCATION, perms);
         }
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-
-    }
+    public void onConnectionSuspended(int i) { }
 
     @Override
     public void onResume() {
@@ -404,7 +380,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         }
     }
 
-
     @Override
     public void onStop() {
         super.onStop();
@@ -421,13 +396,10 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     public void onLowMemory() {
         super.onLowMemory();
         mMapView.onLowMemory();
-
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
 }
 
 

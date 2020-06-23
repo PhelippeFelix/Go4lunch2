@@ -15,10 +15,6 @@ import java.util.Map;
 import cfwz.skiti.go4lunch.model.Booking;
 
 
-/**
- * Created by Skiti on 02/06/2020
- */
-
 public class RestaurantsHelper {
         private static final String COLLECTION_NAME = "booking";
         private static final String COLLECTION_LIKED_NAME = "restaurantLiked";

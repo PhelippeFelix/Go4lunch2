@@ -6,7 +6,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".utils.MainActivity$PlaceholderFragment"
+    tools:context=".ui.MainActivity$PlaceholderFragment"
     android:paddingTop="@dimen/padding_App_bar_height"
     android:paddingBottom="@dimen/padding_App_bar_height">
 
