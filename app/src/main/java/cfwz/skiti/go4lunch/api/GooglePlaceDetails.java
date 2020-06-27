@@ -15,7 +15,7 @@ public interface GooglePlaceDetails {
     Call<PlaceDetails> getDetails(@Query("place_id") String place_id,
                                   @Query("key") String key);
 
-    public static final Retrofit retrofit = new Retrofit.Builder()
+    Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build();

@@ -26,7 +26,7 @@ public class GooglePlaceSearchCalls {
 
         public static void fetchNearbyRestaurants(Callbacks callbacks, String location){
 
-            final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<Callbacks>(callbacks);
+            final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<>(callbacks);
 
             GooglePlaceSearch googlePlaceSearch = GooglePlaceSearch.retrofit.create(GooglePlaceSearch.class);
 

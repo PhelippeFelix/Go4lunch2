@@ -2,11 +2,6 @@ package cfwz.skiti.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
-
-/**
- * Created by Skiti on 23/03/2020
- */
 
 public class Workmate {
     private String uid;

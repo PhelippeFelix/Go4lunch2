@@ -13,7 +13,7 @@ public class BookingTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         booking = new Booking("18/03/2020","1234", "4321","Restaurant_A");
     }
 

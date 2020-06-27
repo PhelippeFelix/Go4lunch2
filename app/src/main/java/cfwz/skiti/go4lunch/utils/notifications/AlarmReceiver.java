@@ -33,11 +33,8 @@ import cfwz.skiti.go4lunch.ui.MainActivity;
 public class AlarmReceiver extends BroadcastReceiver implements GooglePlaceDetailsCalls.Callbacks {
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
     public static final String NOTIFICATION_CHANNEL_NAME = "Go4Lunch";
-    private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
     private List<String> workmatesList;
-    private String mRestaurantName;
-    private String mRestaurantAddress;
     private Context mContext;
 
 
@@ -85,7 +82,7 @@ public class AlarmReceiver extends BroadcastReceiver implements GooglePlaceDetai
         resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, NotificationHelper.ALARM_TYPE_RTC, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification repeatedNotification = buildLocalNotification(mContext, pendingIntent, workmates).build();
-        mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
@@ -94,9 +91,9 @@ public class AlarmReceiver extends BroadcastReceiver implements GooglePlaceDetai
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(true);
             mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
-            mNotificationManager.createNotificationChannel(notificationChannel);
+            notificationManager.createNotificationChannel(notificationChannel);
         }
-        mNotificationManager.notify(NotificationHelper.ALARM_TYPE_RTC, repeatedNotification);
+        notificationManager.notify(NotificationHelper.ALARM_TYPE_RTC, repeatedNotification);
     }
 
     public NotificationCompat.Builder buildLocalNotification(Context mContext, PendingIntent pendingIntent, String workmates) {
@@ -121,8 +118,8 @@ public class AlarmReceiver extends BroadcastReceiver implements GooglePlaceDetai
 
     @Override
     public void onResponse(@Nullable ResultDetails resultDetails) {
-        mRestaurantName = resultDetails.getName();
-        mRestaurantAddress = resultDetails.getVicinity();
+        String restaurantName = resultDetails.getName();
+        String restaurantAddress = resultDetails.getVicinity();
         if (workmatesList.size() > 0){
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < workmatesList.size(); i++){
@@ -133,14 +130,14 @@ public class AlarmReceiver extends BroadcastReceiver implements GooglePlaceDetai
             }
             sendNotification(mContext.getResources().getString(
                     R.string.notification_message_big,
-                    mRestaurantName,
-                    mRestaurantAddress,
+                    restaurantName,
+                    restaurantAddress,
                     sb));
         }else{
             sendNotification(mContext.getResources().getString(
                     R.string.notification_message_big,
-                    mRestaurantName,
-                    mRestaurantAddress,
+                    restaurantName,
+                    restaurantAddress,
                     mContext.getResources().getString(R.string.notification_message_no_workmates)));
         }
     }

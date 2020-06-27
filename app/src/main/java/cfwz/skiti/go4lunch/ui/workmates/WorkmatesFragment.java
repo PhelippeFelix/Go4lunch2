@@ -21,6 +21,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,8 +44,7 @@ public class WorkmatesFragment extends BaseFragment {
 
 
     public static WorkmatesFragment newInstance() {
-        WorkmatesFragment fragment = new WorkmatesFragment();
-        return fragment;
+        return new WorkmatesFragment();
     }
 
     @Override
@@ -73,25 +73,27 @@ public class WorkmatesFragment extends BaseFragment {
     private void initList() {
         UserHelper.getWorkmatesCollection()
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        mWorkmates.clear();
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                mWorkmates.add(document.toObject(Workmate.class));
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                .addOnCompleteListener(task -> {
+                    mWorkmates.clear();
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            mWorkmates.add(document.toObject(Workmate.class));
+                            Log.d(TAG, document.getId() + " => " + document.getData());
                         }
-                        mRecyclerView.setAdapter(new WorkmatesRecyclerViewAdapter(mWorkmates));
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
                     }
+                    Collections.sort(mWorkmates, new Comparator<Workmate>(){
+                        public int compare(Workmate obj1, Workmate obj2) {
+                            return obj1.getUid().compareToIgnoreCase(obj2.getUid());
+                        }
+                    });
+                    mRecyclerView.setAdapter(new WorkmatesRecyclerViewAdapter(mWorkmates));
                 });
     }
 
 
-        private void configureOnClickRecyclerView(){
+    private void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_workmates_object_list)
                 .setOnItemClickListener((recyclerView, position, v) -> {
                     Workmate result = mViewAdapter.getWorkmates(position);

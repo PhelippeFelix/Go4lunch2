@@ -22,7 +22,7 @@ public class GooglePlaceDetailsCalls {
 
     public static void fetchPlaceDetails(Callbacks callbacks, String place_id){
 
-        final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<Callbacks>(callbacks);
+        final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<>(callbacks);
 
         GooglePlaceDetails googlePlaceDetails = GooglePlaceDetails.retrofit.create(GooglePlaceDetails.class);
 

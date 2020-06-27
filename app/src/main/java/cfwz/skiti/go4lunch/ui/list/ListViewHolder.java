@@ -149,14 +149,14 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
     }
 
     private void getOpeningHoursInfo(ResultDetails resultDetails){
-        int daysArray[] = {0,1,2,3,4,5,6};
+        int[] daysArray = {0, 1, 2, 3, 4, 5, 6};
 
         Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_WEEK) - 1;
         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
         int minOfDay = calendar.get(Calendar.MINUTE);
         if (minOfDay < 10){minOfDay = '0'+minOfDay;}
-        String currentHourString = Integer.toString(hourOfDay)+Integer.toString(minOfDay);
+        String currentHourString = hourOfDay +Integer.toString(minOfDay);
         int currentHour = Integer.parseInt(currentHourString);
 
         for (int i=0;i < resultDetails.getOpeningHours().getPeriods().size();i++){

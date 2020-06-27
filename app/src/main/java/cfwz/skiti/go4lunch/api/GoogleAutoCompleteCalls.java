@@ -24,7 +24,7 @@ public class GoogleAutoCompleteCalls {
 
     public static void fetchAutoCompleteResult(GoogleAutoCompleteCalls.Callbacks callbacks, String input, String location){
 
-        final WeakReference<GoogleAutoCompleteCalls.Callbacks> callbacksWeakReference = new WeakReference<GoogleAutoCompleteCalls.Callbacks>(callbacks);
+        final WeakReference<GoogleAutoCompleteCalls.Callbacks> callbacksWeakReference = new WeakReference<>(callbacks);
 
         GoogleAutoComplete googleAutoComplete = GoogleAutoComplete.retrofit.create(GoogleAutoComplete.class);
 

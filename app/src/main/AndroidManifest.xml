@@ -54,10 +54,23 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- LOG ACTIVITY -->
+        </activity>
         <activity
             android:name=".ui.loggin.LogginActivity"
             android:label="@string/toolbar_title_login_activity"
             android:parentActivityName=".ui.MainActivity" />
+        <receiver android:name=".utils.notifications.AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Will not be called unless the application explicitly enables it -->
+        <receiver android:name=".utils.notifications.DeviceBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

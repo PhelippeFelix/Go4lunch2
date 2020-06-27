@@ -33,11 +33,11 @@ public class ProfileViewHolder  extends RecyclerView.ViewHolder {
                 glide.load(R.drawable.ic_anon_user_48dp).apply(RequestOptions.circleCropTransform()).into(mImageView);
             }
             this.mTextView.setText(itemView.getResources().getString(R.string.restaurant_detail_recyclerview, results.getName()));
-            this.changeTextColor(R.color.colorBlack);
+            this.changeTextColor();
         }
 
-        private void changeTextColor(int color){
-            int mColor = itemView.getContext().getResources().getColor(color);
+        private void changeTextColor(){
+            int mColor = itemView.getContext().getResources().getColor(R.color.colorBlack);
             this.mTextView.setTextColor(mColor);
         }
     }

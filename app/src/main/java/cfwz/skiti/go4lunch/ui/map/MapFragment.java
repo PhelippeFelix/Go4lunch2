@@ -54,7 +54,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
@@ -87,7 +87,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = ViewModelProviders.of(getActivity()).get(MapViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MapViewModel.class);
     }
 
     @Override
@@ -96,9 +96,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, view);
         setHasOptionsMenu(true);
-        mViewModel.currentUserPosition.observe(getViewLifecycleOwner(), latLng -> {
-            GooglePlaceSearch();
-        });
+        mViewModel.currentUserPosition.observe(getViewLifecycleOwner(), latLng -> GooglePlaceSearch());
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume();
         this.configureMapView();
@@ -157,20 +155,17 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         } catch (Exception e) {
             e.printStackTrace();
         }
-        mMapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap mMap) {
-                googleMap = mMap;
-                if (checkLocationPermission()) {
-                    googleMap.setMyLocationEnabled(true);
-                }
-                googleMap.getUiSettings().setCompassEnabled(true);
-                googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-                View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).
-                        getParent()).findViewById(Integer.parseInt("2"));
-                googleMap.getUiSettings().setRotateGesturesEnabled(true);
-                googleMap.setOnMarkerClickListener(MapFragment.this::onClickMarker);
+        mMapView.getMapAsync(mMap -> {
+            googleMap = mMap;
+            if (checkLocationPermission()) {
+                googleMap.setMyLocationEnabled(true);
             }
+            googleMap.getUiSettings().setCompassEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).
+                    getParent()).findViewById(Integer.parseInt("2"));
+            googleMap.getUiSettings().setRotateGesturesEnabled(true);
+            googleMap.setOnMarkerClickListener(MapFragment.this::onClickMarker);
         });
     }
 
@@ -229,8 +224,8 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(100 * 1000)        // 100 seconds, in milliseconds
-                .setFastestInterval(1000); // 1 second, in milliseconds
+                .setInterval(100 * 1000)
+                .setFastestInterval(1000);
     }
 
     private void configureLocationCallBack() {
@@ -248,11 +243,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     }
 
     public boolean checkLocationPermission() {
-        if (EasyPermissions.hasPermissions(getContext(), perms)) {
-            return true;
-        } else {
-            return false;
-        }
+        return EasyPermissions.hasPermissions(getContext(), perms);
     }
 
     @SuppressLint("MissingPermission")
@@ -331,25 +322,21 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     public void onConnected(@Nullable Bundle bundle) {
         if (EasyPermissions.hasPermissions(getContext(), perms)) {
             mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-                                    public void onClick(View v)
-                                    {
-                                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(mViewModel.getCurrentUserPosition()));
-                                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
-                                    }
-                                });
-                                handleNewLocation(location);
-                            } else {
-                                if (EasyPermissions.hasPermissions(getContext(), perms)) {
-                                    mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+                    .addOnSuccessListener(getActivity(), location -> {
+                        if (location != null) {
+                            mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View v)
+                                {
+                                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(mViewModel.getCurrentUserPosition()));
+                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
                                 }
-
+                            });
+                            handleNewLocation(location);
+                        } else {
+                            if (EasyPermissions.hasPermissions(getContext(), perms)) {
+                                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
                             }
+
                         }
                     });
         } else {

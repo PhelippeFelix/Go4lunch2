@@ -8,10 +8,9 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
-        mViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MapViewModel.class);
         this.configureToolbar();
         this.retrieveUserSettings();
         this.setListenerAndFilters();
@@ -52,30 +51,34 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void configureToolbar(){
         setSupportActionBar(mToolbar);
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     private void retrieveUserSettings(){
-        UserHelper.getWorkmatesCollection().document(getCurrentUser().getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.e("TAG", "Listen failed.", e);
-                    return;
+        UserHelper.getWorkmatesCollection().document(getCurrentUser().getUid()).addSnapshotListener((documentSnapshot, e) -> {
+            if (e != null) {
+                Log.e("TAG", "Listen failed.", e);
+                return;
+            }
+            if (documentSnapshot != null && documentSnapshot.exists()) {
+                Log.e("TAG", "Current data: " + documentSnapshot.getData());
+                if (documentSnapshot.getData().get("notification").equals(true)){
+                    mSwitch.setChecked(true);
+                    mNotificationHelper.scheduleRepeatingNotification();
+                }else{
+                    mSwitch.setChecked(false);
+                    mNotificationHelper.cancelAlarmRTC();
                 }
-                if (documentSnapshot != null && documentSnapshot.exists()) {
-                    Log.e("TAG", "Current data: " + documentSnapshot.getData());
-                    if (documentSnapshot.getData().get("notification").equals(true)){
-                        mSwitch.setChecked(true);
-                        mNotificationHelper.scheduleRepeatingNotification();
-                    }else{
-                        mSwitch.setChecked(false);
-                        mNotificationHelper.cancelAlarmRTC();
-                    }
-                } else {
-                    Log.e("TAG", "Current data: null");
-                }
+            } else {
+                Log.e("TAG", "Current data: null");
             }
         });
     }

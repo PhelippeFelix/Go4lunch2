@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cfwz.skiti.go4lunch.R;
@@ -14,7 +15,7 @@ import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
 
 
 public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListViewHolder> {
-    private List<ResultDetails> mResultDetails;
+    private List<ResultDetails> mResultDetails = new ArrayList<>();
     private String mLocation;
 
     public ListRecyclerViewAdapter(List<ResultDetails> items, String location) {
@@ -35,6 +36,11 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListViewHolder
 
     public ResultDetails getRestaurantDetails(int position){
         return this.mResultDetails.get(position);
+    }
+
+    public void clearViewAdapter(){
+        if (mResultDetails!=null)
+        mResultDetails.clear();
     }
 
     @Override

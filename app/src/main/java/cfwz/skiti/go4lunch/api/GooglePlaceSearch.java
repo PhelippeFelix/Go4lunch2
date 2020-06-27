@@ -17,7 +17,7 @@ public interface GooglePlaceSearch {
                                                   @Query("type") String type,
                                                   @Query("key") String key);
 
-    public static final Retrofit retrofit = new Retrofit.Builder()
+    Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build();

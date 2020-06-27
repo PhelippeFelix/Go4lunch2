@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -74,12 +73,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     protected OnFailureListener onFailureListener(){
-        return new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
-            }
-        };
+        return e -> Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
     }
 
     @Nullable
@@ -137,10 +131,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void configureNavigationView() {
         this.navigationView = findViewById(R.id.activity_main_nav_view);
         final View headerLayout = navigationView.getHeaderView(0);
-        imageProfileView = (ImageView) headerLayout.findViewById(R.id.imageProfileView);
-        emailUser = (TextView) headerLayout.findViewById(R.id.emailUser);
-        nameUser = (TextView) headerLayout.findViewById(R.id.nameUser);
-        backgroundView = (ImageView) headerLayout.findViewById(R.id.side_nav_bar);
+        imageProfileView = headerLayout.findViewById(R.id.imageProfileView);
+        emailUser = headerLayout.findViewById(R.id.emailUser);
+        nameUser = headerLayout.findViewById(R.id.nameUser);
+        backgroundView = headerLayout.findViewById(R.id.side_nav_bar);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -206,20 +200,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void signOutUserFromFirebase(){
         AuthUI.getInstance()
                 .signOut(this)
-                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted());
     }
 
-    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin){
-        return new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                switch (origin){
-                    case SIGN_OUT_TASK:
-                        startSignInActivity();
-                        break;
-                    default:
-                        break;
-                }
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(){
+        return aVoid -> {
+            if (MainActivity.SIGN_OUT_TASK == SIGN_OUT_TASK) {
+                startSignInActivity();
             }
         };
     }
