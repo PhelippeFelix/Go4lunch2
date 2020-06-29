@@ -32,20 +32,24 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultSearch;
 import cfwz.skiti.go4lunch.ui.loggin.LogginActivity;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
 import cfwz.skiti.go4lunch.ui.settings.SettingsActivity;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     Toolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;

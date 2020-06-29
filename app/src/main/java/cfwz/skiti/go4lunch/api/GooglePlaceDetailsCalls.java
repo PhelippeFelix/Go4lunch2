@@ -13,7 +13,7 @@ import retrofit2.Response;
 
 
 public class GooglePlaceDetailsCalls {
-     static String apiKey = BuildConfig.google_api_key;
+     static String apiKey = BuildConfig.api_key;
 
     public interface Callbacks {
         void onResponse(@Nullable ResultDetails resultDetails);

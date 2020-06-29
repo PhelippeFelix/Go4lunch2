@@ -3,16 +3,9 @@ package cfwz.skiti.go4lunch.ui.workmates;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-
-
 import java.util.List;
-
-
 import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.model.Workmate;
 

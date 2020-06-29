@@ -73,7 +73,7 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         Context context = view.getContext();
         checkLocationPermission();
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getContext());
-        fusedLocationClient.getLastLocation().addOnSuccessListener( getActivity(), location -> {
+        fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
             if (location != null) {
                 double currentLatitude = location.getLatitude();
                 double currentLongitude = location.getLongitude();
@@ -84,6 +84,7 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         mViewModel.currentUserPosition.observe(getViewLifecycleOwner(), latLng -> GooglePlaceSearch());
+
         setHasOptionsMenu(true);
         configureOnClickRecyclerView();
         return view;
@@ -93,7 +94,7 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         GooglePlaceSearchCalls.fetchNearbyRestaurants(this, mViewModel.getCurrentUserPositionFormatted());
     }
 
-    private void configureOnClickRecyclerView(){
+    private void configureOnClickRecyclerView() {
         ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_restaurant_object_list)
                 .setOnItemClickListener((recyclerView, position, v) -> {
                     ResultDetails result = mViewAdapter.getRestaurantDetails(position);
@@ -119,22 +120,23 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (query.length() > 2 ){
-                    mResultDetailsList.clear();
+                if (query.length() > 2) {
                     GoogleAutoCompleteSearch(query);
-                }else{
+                    searchView.clearFocus();
+                } else {
                     Toast.makeText(getContext(), getResources().getString(R.string.search_too_short), Toast.LENGTH_LONG).show();
                 }
                 return true;
 
             }
+
             @Override
             public boolean onQueryTextChange(String query) {
-                if (query.length() > 2){
-                    mResultDetailsList.clear();
+                if (query.length() > 2) {
+                    System.out.println("tictic");
                     GoogleAutoCompleteSearch(query);
-                }else if (query.length() == 0){
-                    mResultDetailsList.clear();
+                } else if (query.length() == 0) {
+                    System.out.println("tactac");
                     GooglePlaceSearch();
                 }
                 return false;
@@ -143,7 +145,7 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
     }
 
     private void GoogleAutoCompleteSearch(String query) {
-        GoogleAutoCompleteCalls.fetchAutoCompleteResult(this,query,mViewModel.getCurrentUserPositionFormatted());
+        GoogleAutoCompleteCalls.fetchAutoCompleteResult(this, query, mViewModel.getCurrentUserPositionFormatted());
     }
 
     @Override
@@ -155,25 +157,29 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
 
     private void SearchToDetails(List<ResultSearch> resultSearchList) {
         mResultDetailsList.clear();
-        for (int i=0;i<resultSearchList.size();i++){
-            GooglePlaceDetailsCalls.fetchPlaceDetails(this,resultSearchList.get(i).getPlaceId());
+        for (int i = 0; i < resultSearchList.size(); i++) {
+            GooglePlaceDetailsCalls.fetchPlaceDetails(this, resultSearchList.get(i).getPlaceId());
         }
     }
 
     private void AutoCompleteToDetails(AutoCompleteResult autoCompleteResult) {
+        System.out.println("tac");
         mResultDetailsList.clear();
-        for (int i=0;i<autoCompleteResult.getPredictions().size();i++)
-        {
+        for (int i = 0; i < autoCompleteResult.getPredictions().size(); i++) {
             GooglePlaceDetailsCalls.fetchPlaceDetails(this, autoCompleteResult.getPredictions().get(i).getPlaceId());
         }
     }
 
     @Override
     public void onResponse(@Nullable ResultDetails resultDetails) {
-        if (resultDetails.getTypes().contains("restaurant"))
-        mResultDetailsList.add(resultDetails);
-            else{resultSize--;}
-        if (mResultDetailsList.size()==resultSize){
+        if (resultDetails.getTypes().contains("restaurant")){
+            System.out.println(resultSize);
+            mResultDetailsList.add(resultDetails);}
+        else {
+            resultSize--;
+        }
+        if (mResultDetailsList.size() == resultSize) {
+            System.out.println(resultSize+"SDFSDF");
             configureRecyclerView();
         }
     }
@@ -201,19 +207,21 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         return EasyPermissions.hasPermissions(getContext(), perms);
     }
 
-    private void configureRecyclerView(){
-        if (mViewAdapter!=null)this.mViewAdapter.clearViewAdapter();
+    private void configureRecyclerView() {
         this.mViewAdapter = new ListRecyclerViewAdapter(this.mResultDetailsList, mViewModel.getCurrentUserPositionFormatted());
         this.mRecyclerView.setAdapter(this.mViewAdapter);
         this.mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) { }
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+    }
 
     @Override
-    public void onProviderEnabled(String s) { }
+    public void onProviderEnabled(String s) {
+    }
 
     @Override
-    public void onProviderDisabled(String s) { }
+    public void onProviderDisabled(String s) {
+    }
 }

@@ -20,9 +20,6 @@ import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.model.Workmate;
 
-/**
- * Created by Skiti on 02/06/2020
- */
 
 public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.item_list_avatar) public ImageView mWorkmateAvatar;

@@ -156,7 +156,7 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
                 this.displayFAB((R.drawable.ic_check_circle_black_24dp),getResources().getColor(R.color.colorGreen));
                 Toast.makeText(this, getResources().getString(R.string.restaurant_error_retrieving_info), Toast.LENGTH_SHORT).show();
             }
-            Picasso.with(this).load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+results.getPhotos().get(0).getPhotoReference()+"&key="+ BuildConfig.google_api_key).into(mImageView);
+            Picasso.with(this).load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+results.getPhotos().get(0).getPhotoReference()+"&key="+ BuildConfig.api_key).into(mImageView);
             mRestaurantName.setText(results.getName());
             mRestaurantAddress.setText(results.getVicinity());
             this.displayRating(results);

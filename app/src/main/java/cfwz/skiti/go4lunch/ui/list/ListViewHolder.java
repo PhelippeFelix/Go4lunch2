@@ -100,7 +100,7 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
 
         if (!(resultDetails.getPhotos() == null)){
             if (!(resultDetails.getPhotos().isEmpty())){
-                glide.load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+resultDetails.getPhotos().get(0).getPhotoReference()+"&key="+ BuildConfig.google_api_key).into(mAvatarRestaurant);
+                glide.load(BASE_URL+"?maxwidth="+MAX_WIDTH+"&maxheight="+MAX_HEIGHT+"&photoreference="+resultDetails.getPhotos().get(0).getPhotoReference()+"&key="+ BuildConfig.api_key).centerCrop().into(mAvatarRestaurant);
             }
         }else{
             glide.load(R.drawable.ic_no_image_available).apply(RequestOptions.centerCropTransform()).into(mAvatarRestaurant);
@@ -160,7 +160,7 @@ public class ListViewHolder extends RecyclerView.ViewHolder{
         int currentHour = Integer.parseInt(currentHourString);
 
         for (int i=0;i < resultDetails.getOpeningHours().getPeriods().size();i++){
-            if (resultDetails.getOpeningHours().getPeriods().get(i).getOpen().getDay() == daysArray[day]){
+            if (resultDetails.getOpeningHours().getPeriods().get(i).getOpen().getDay() == daysArray[day]&&resultDetails.getOpeningHours().getPeriods().get(i).getClose()!=null){
                 String closeHour = resultDetails.getOpeningHours().getPeriods().get(i).getClose().getTime();
                 if (currentHour < Integer.parseInt(closeHour) || daysArray[day] < resultDetails.getOpeningHours().getPeriods().get(i).getClose().getDay()){
                     int timeDifference = Integer.parseInt(closeHour) - currentHour;

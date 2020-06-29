@@ -3,6 +3,7 @@ package cfwz.skiti.go4lunch.ui.loggin;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,9 +27,11 @@ import cfwz.skiti.go4lunch.api.UserHelper;
 
 
 public class LogginActivity extends Activity {
-    @BindView(R.id.log_activity_coordinator_layout) CoordinatorLayout coordinatorLayout;
+    @BindView(R.id.log_activity_coordinator_layout)
+    CoordinatorLayout coordinatorLayout;
 
     private static final int RC_SIGN_IN = 123;
+    boolean doubleBackToExitPressedOnce = false;
 
 
     @Override
@@ -39,7 +42,7 @@ public class LogginActivity extends Activity {
         this.startSignInActivity();
     }
 
-    private void startSignInActivity(){
+    private void startSignInActivity() {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -54,17 +57,37 @@ public class LogginActivity extends Activity {
                         .build(),
                 RC_SIGN_IN);
     }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
-    private void showSnackBar(CoordinatorLayout coordinatorLayout, String message){
+    private void showSnackBar(CoordinatorLayout coordinatorLayout, String message) {
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
+    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data) {
         IdpResponse response = IdpResponse.fromResultIntent(data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
@@ -82,21 +105,23 @@ public class LogginActivity extends Activity {
         }
     }
 
-    protected OnFailureListener onFailureListener(){
+    protected OnFailureListener onFailureListener() {
         return e -> Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
     }
 
     @Nullable
-    public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+    public FirebaseUser getCurrentUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
+    }
 
     private void createWorkmate() {
-        if (this.getCurrentUser() != null){
+        if (this.getCurrentUser() != null) {
             String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
             String name = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
-            UserHelper.createWorkmate(uid,urlPicture, name).addOnFailureListener(this.onFailureListener());
+            UserHelper.createWorkmate(uid, urlPicture, name).addOnFailureListener(this.onFailureListener());
         }
-      }
     }
+}
 
 

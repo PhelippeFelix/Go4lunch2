@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
     buildToolsVersion "29.0.2"
     compileOptions {
         targetCompatibility = "8"
@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "cfwz.skiti.go4lunch"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -19,7 +19,8 @@ android {
     }
     buildTypes {
         buildTypes.each {
-            it.buildConfigField 'String', 'google_api_key', google_api_key
+            it.buildConfigField 'String', 'api_key', api_key
+            it.resValue 'string', 'api_key', (project.findProperty("api_key") ?: "0")
         }
         release {
             minifyEnabled false

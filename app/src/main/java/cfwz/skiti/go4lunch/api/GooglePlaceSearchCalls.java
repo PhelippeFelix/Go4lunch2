@@ -15,7 +15,7 @@ import retrofit2.Response;
 
 
 public class GooglePlaceSearchCalls {
-    static String apiKey = BuildConfig.google_api_key;
+    static String apiKey = BuildConfig.api_key;
     static String type = "restaurant";
     static String rankby = "distance";
 

@@ -38,11 +38,6 @@ public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListViewHolder
         return this.mResultDetails.get(position);
     }
 
-    public void clearViewAdapter(){
-        if (mResultDetails!=null)
-        mResultDetails.clear();
-    }
-
     @Override
     public int getItemCount() {
         int itemCount = 0;

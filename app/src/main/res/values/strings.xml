@@ -33,7 +33,6 @@
     <string name="restaurant_closing_soon">Closing soon (%1$s)</string>
     <string name="restaurant_mates_number" translatable="false">(%1$d)</string>
 
-
     <!-- FACEBOOK PURPOSE -->
     <string name="facebook_application_id" translatable="false">222821079119135</string>
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb222821079119135</string>
@@ -106,4 +105,5 @@
     <string name="settings_save_text">Save</string>
     <string name="settings_notification_title">Notifications</string>
     <string name="settings_save_ok">Settings saved!</string>
+    <string name="no_return">Cant return</string>
 </resources>

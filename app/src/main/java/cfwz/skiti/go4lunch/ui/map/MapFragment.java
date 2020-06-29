@@ -386,7 +386,8 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) { }
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    }
 }
 
 
