@@ -65,6 +65,7 @@ public class WorkmatesFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
         ButterKnife.bind(this, view);
         Context context = view.getContext();
+        setHasOptionsMenu(true);
         initList();
         mRecyclerView = (RecyclerView) view;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -95,6 +96,50 @@ public class WorkmatesFragment extends BaseFragment {
                     });
                     mRecyclerView.setAdapter(new WorkmatesRecyclerViewAdapter(mWorkmates));
                 });
+    }
+
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.activity_main_appbar, menu);
+        SearchManager searchManager = (SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE);
+        MenuItem item = menu.findItem(R.id.menu_activity_main_search);
+        SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        item.setActionView(searchView);
+        searchView.setQueryHint(getResources().getString(R.string.toolbar_search_hint));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(((MainActivity) getContext()).getComponentName()));
+        searchView.setIconifiedByDefault(false);//
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.length() > 1 ){
+                    sortWorkmates(query);
+                    searchView.clearFocus();
+                }else{
+                    Toast.makeText(getContext(), getResources().getString(R.string.search_too_short), Toast.LENGTH_LONG).show();
+                }
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String query) {
+                if (query.length() > 1){
+                    sortWorkmates(query);
+                } else if (query.length() < 1 ){
+                    initList();
+                }
+                return false;
+            }
+        });
+    }
+
+    private void sortWorkmates(String query){
+        for (int i=0;i<mWorkmates.size();i++) {
+         if (!mWorkmates.get(i).getName().toUpperCase().contains(query.toUpperCase())){
+             mWorkmates.remove(i);
+         i=0;}
+        }mRecyclerView.setAdapter(new WorkmatesRecyclerViewAdapter(mWorkmates));
     }
 
 

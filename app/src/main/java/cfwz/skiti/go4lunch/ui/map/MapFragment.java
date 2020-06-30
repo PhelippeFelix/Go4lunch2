@@ -270,8 +270,6 @@ public class MapFragment extends BaseFragment implements LocationListener,Google
     }catch (Exception e) {
                 e.printStackTrace();
             }
-        }else{
-            configureGoogleApiClient();
         }
     }
 

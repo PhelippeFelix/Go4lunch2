@@ -230,11 +230,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private void checkIfUserAlreadyBookedRestaurant(String userId, String restaurantId, String restaurantName, Boolean tryingToBook){
         RestaurantsHelper.getBooking(userId, getTodayDate()).addOnCompleteListener(restaurantTask -> {
-            System.out.println("1");
             if (restaurantTask.isSuccessful()){
                 if (restaurantTask.getResult().size() == 1){
                     for (QueryDocumentSnapshot restaurant : restaurantTask.getResult()) {
-                        System.out.println("2");
                         if (restaurant.getData().get("restaurantName").equals(restaurantName)){
                             this.displayFAB((R.drawable.ic_clear_black_24dp),getResources().getColor(R.color.colorError));
                             if (tryingToBook){
@@ -307,7 +305,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onResponse(@Nullable ResultDetails resultDetails) {
-        System.out.println("placeId"+resultDetails.getPlaceId());
         this.requestResult = resultDetails;
         updateUI(resultDetails);
     }

@@ -108,6 +108,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    protected OnFailureListener onFailureListener(){
+        return e -> Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
+    }
+
     @Nullable
     public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 
