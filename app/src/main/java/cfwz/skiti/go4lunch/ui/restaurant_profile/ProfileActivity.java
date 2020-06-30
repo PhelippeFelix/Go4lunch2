@@ -1,5 +1,6 @@
 package cfwz.skiti.go4lunch.ui.restaurant_profile;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -15,11 +16,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
@@ -47,7 +52,7 @@ import static cfwz.skiti.go4lunch.ui.list.ListViewHolder.MAX_STAR;
 import static cfwz.skiti.go4lunch.ui.list.ListViewHolder.MAX_WIDTH;
 
 
-public class ProfileActivity extends MainActivity implements View.OnClickListener, GooglePlaceDetailsCalls.Callbacks {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener, GooglePlaceDetailsCalls.Callbacks {
     @Nullable @BindView(R.id.restaurant_name) TextView mRestaurantName;
     @Nullable @BindView(R.id.restaurant_address)TextView mRestaurantAddress;
     @Nullable @BindView(R.id.restaurant_recycler_view) RecyclerView mRestaurantRecyclerView;
@@ -225,9 +230,11 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
 
     private void checkIfUserAlreadyBookedRestaurant(String userId, String restaurantId, String restaurantName, Boolean tryingToBook){
         RestaurantsHelper.getBooking(userId, getTodayDate()).addOnCompleteListener(restaurantTask -> {
+            System.out.println("1");
             if (restaurantTask.isSuccessful()){
                 if (restaurantTask.getResult().size() == 1){
                     for (QueryDocumentSnapshot restaurant : restaurantTask.getResult()) {
+                        System.out.println("2");
                         if (restaurant.getData().get("restaurantName").equals(restaurantName)){
                             this.displayFAB((R.drawable.ic_clear_black_24dp),getResources().getColor(R.color.colorError));
                             if (tryingToBook){
@@ -291,8 +298,16 @@ public class ProfileActivity extends MainActivity implements View.OnClickListene
         return df.format(c.getTime());
     }
 
+    protected OnFailureListener onFailureListener(){
+        return e -> Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
+    }
+
+    @Nullable
+    public FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
+
     @Override
     public void onResponse(@Nullable ResultDetails resultDetails) {
+        System.out.println("placeId"+resultDetails.getPlaceId());
         this.requestResult = resultDetails;
         updateUI(resultDetails);
     }

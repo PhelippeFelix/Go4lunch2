@@ -15,7 +15,7 @@ import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
 
 
 public class ListRecyclerViewAdapter extends RecyclerView.Adapter<ListViewHolder> {
-    private List<ResultDetails> mResultDetails = new ArrayList<>();
+    private List<ResultDetails> mResultDetails;
     private String mLocation;
 
     public ListRecyclerViewAdapter(List<ResultDetails> items, String location) {

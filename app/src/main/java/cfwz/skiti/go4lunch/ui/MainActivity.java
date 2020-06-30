@@ -1,6 +1,8 @@
 package cfwz.skiti.go4lunch.ui;
 
+import android.Manifest;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -13,6 +15,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,6 +33,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
@@ -40,16 +48,24 @@ import java.util.Map;
 
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.R;
+import cfwz.skiti.go4lunch.api.GoogleAutoCompleteCalls;
+import cfwz.skiti.go4lunch.api.GooglePlaceDetailsCalls;
+import cfwz.skiti.go4lunch.api.GooglePlaceSearchCalls;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
+import cfwz.skiti.go4lunch.model.autocomplete.AutoCompleteResult;
 import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
 import cfwz.skiti.go4lunch.model.googleplaces.ResultSearch;
 import cfwz.skiti.go4lunch.ui.loggin.LogginActivity;
+import cfwz.skiti.go4lunch.ui.map.MapViewModel;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
 import cfwz.skiti.go4lunch.ui.settings.SettingsActivity;
 import jp.wasabeef.glide.transformations.BlurTransformation;
+import pub.devrel.easypermissions.EasyPermissions;
+
+import static android.app.PendingIntent.getActivity;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GooglePlaceSearchCalls.Callbacks, GooglePlaceDetailsCalls.Callbacks, GoogleAutoCompleteCalls.Callbacks, LocationListener {
     Toolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -58,26 +74,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView nameUser;
     TextView emailUser;
 
+    private static final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    public MapViewModel mViewModel;
+    public List<ResultDetails> mResultDetailsList = new ArrayList<>();
+    private int resultSize;
+    public MutableLiveData<List<ResultDetails>> mLiveData = new MutableLiveData<>();
     private static final int SIGN_OUT_TASK = 10;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ButterKnife.bind(this);
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupWithNavController(navView, navController);
+        checkLocationPermission();
+        mViewModel = new ViewModelProvider(this).get(MapViewModel.class);
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getApplicationContext());
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if (location != null) {
+                double currentLatitude = location.getLatitude();
+                double currentLongitude = location.getLongitude();
+                mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
+                GooglePlaceSearchCalls.fetchNearbyRestaurants(this, mViewModel.getCurrentUserPositionFormatted());
+            }
+        });
         this.configureToolBar();
         this.configureDrawerLayout();
         this.configureNavigationView();
         if (!isCurrentUserLogged()){startSignInActivity();}
         this.updateUI();
-        ButterKnife.bind(this);
-    }
 
-    protected OnFailureListener onFailureListener(){
-        return e -> Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
     }
 
     @Nullable
@@ -213,5 +241,67 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startSignInActivity();
             }
         };
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+
+        mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
+    }
+
+    public boolean checkLocationPermission() {
+        return EasyPermissions.hasPermissions(getApplicationContext(), perms);
+    }
+
+    @Override
+    public void onResponse(@Nullable AutoCompleteResult autoCompleteResult) {
+        resultSize = autoCompleteResult.getPredictions().size();
+        AutoCompleteToDetails(autoCompleteResult);
+    }
+
+    @Override
+    public void onResponse(@Nullable ResultDetails resultDetails) {
+        if (resultDetails.getTypes().contains("restaurant")){
+            mResultDetailsList.add(resultDetails); }
+        else {
+            resultSize--;
+        }if (mResultDetailsList.size()==resultSize){
+            mLiveData.setValue(mResultDetailsList);
+        }
+    }
+
+    @Override
+    public void onResponse(@Nullable List<ResultSearch> resultSearchList) {
+        resultSize=resultSearchList.size();
+        SearchToDetails(resultSearchList);
+    }
+
+    private void SearchToDetails(List<ResultSearch> resultSearchList) {
+        mResultDetailsList.clear();
+        for (int i = 0; i < resultSearchList.size(); i++) {
+            GooglePlaceDetailsCalls.fetchPlaceDetails(this, resultSearchList.get(i).getPlaceId());
+        }
+    }
+
+    private void AutoCompleteToDetails(AutoCompleteResult autoCompleteResult) {
+        mResultDetailsList.clear();
+        for (int i = 0; i < autoCompleteResult.getPredictions().size(); i++) {
+            GooglePlaceDetailsCalls.fetchPlaceDetails(this, autoCompleteResult.getPredictions().get(i).getPlaceId());
+        }
+    }
+
+    public void GoogleAutoCompleteSearch(String query) {
+        GoogleAutoCompleteCalls.fetchAutoCompleteResult(this, query, mViewModel.getCurrentUserPositionFormatted());
+    }
+
+    @Override
+    public void onFailure() {
+        Toast.makeText(this.getApplicationContext(), getResources().getString(R.string.no_restaurant_error_message), Toast.LENGTH_SHORT).show();
+    }
+
+    public void resetList() {
+        GooglePlaceSearchCalls.fetchNearbyRestaurants(this, mViewModel.getCurrentUserPositionFormatted());
     }
 }

@@ -62,11 +62,12 @@ public class LogginActivity extends Activity {
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed();
+            finish();
             return;
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Please click BACK again to exit loggin", Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
 

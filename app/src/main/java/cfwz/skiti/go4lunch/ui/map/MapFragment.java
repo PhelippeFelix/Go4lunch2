@@ -31,22 +31,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
-import cfwz.skiti.go4lunch.model.autocomplete.AutoCompleteResult;
-import cfwz.skiti.go4lunch.api.GoogleAutoCompleteCalls;
+import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
 import cfwz.skiti.go4lunch.ui.BaseFragment;
 import cfwz.skiti.go4lunch.ui.MainActivity;
@@ -54,16 +48,13 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
+
+import java.util.List;
 
 import cfwz.skiti.go4lunch.R;
-import cfwz.skiti.go4lunch.model.googleplaces.ResultDetails;
-import cfwz.skiti.go4lunch.model.googleplaces.ResultSearch;
-import cfwz.skiti.go4lunch.api.GooglePlaceDetailsCalls;
-import cfwz.skiti.go4lunch.api.GooglePlaceSearchCalls;
 
 
-public class MapFragment extends BaseFragment implements LocationListener, GooglePlaceDetailsCalls.Callbacks, GooglePlaceSearchCalls.Callbacks,GoogleApiClient.OnConnectionFailedListener, GoogleAutoCompleteCalls.Callbacks, GoogleApiClient.ConnectionCallbacks {
+public class MapFragment extends BaseFragment implements LocationListener,GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     @BindView(R.id.map) MapView mMapView;
     @BindView(R.id.fragment_map_floating_action_btn) FloatingActionButton mFloatingActionButton;
 
@@ -75,9 +66,8 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
-    private MapViewModel mViewModel;
-    private List<ResultDetails> mResultDetails;
-    private int resultSize;
+    private MainActivity mMainActivity;
+    private List<ResultDetails> mResultDetailsList;
 
 
     public static MapFragment newInstance() {
@@ -87,7 +77,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(MapViewModel.class);
+        mMainActivity = (MainActivity)getActivity();
     }
 
     @Override
@@ -96,7 +86,7 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, view);
         setHasOptionsMenu(true);
-        mViewModel.currentUserPosition.observe(getViewLifecycleOwner(), latLng -> GooglePlaceSearch());
+        mMainActivity.mLiveData.observe(getViewLifecycleOwner(),resultDetails -> updateUI() );
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume();
         this.configureMapView();
@@ -123,7 +113,8 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() > 2 ){
-                    GoogleAutoCompleteSearch(query);
+                    mMainActivity.GoogleAutoCompleteSearch(query);
+                    searchView.clearFocus();
                 }else{
                     Toast.makeText(getContext(), getResources().getString(R.string.search_too_short), Toast.LENGTH_LONG).show();
                 }
@@ -132,21 +123,13 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
             @Override
             public boolean onQueryTextChange(String query) {
                 if (query.length() > 2){
-                    GoogleAutoCompleteSearch(query);
-                } else if (query.length() < 2){
-                    GooglePlaceSearch();
+                    mMainActivity.GoogleAutoCompleteSearch(query);
+                } else if (query.length() == 0 ){
+                    mMainActivity.resetList();
                 }
                 return false;
             }
         });
-    }
-
-    private void GoogleAutoCompleteSearch(String query) {
-        GoogleAutoCompleteCalls.fetchAutoCompleteResult(this,query,mViewModel.getCurrentUserPositionFormatted());
-    }
-
-    private void GooglePlaceSearch(){
-        GooglePlaceSearchCalls.fetchNearbyRestaurants(this,mViewModel.getCurrentUserPositionFormatted());
     }
 
     private void configureMapView() {
@@ -169,17 +152,19 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         });
     }
 
-    private void updateUI(List<ResultDetails> results){
+    private void updateUI(){
+        if (googleMap!=null)
+            if (mMainActivity.mLiveData.getValue()!=null){
         googleMap.clear();
-        Log.e(TAG, "updateUI: " + results.size());
-            if (results.size() > 0){
-                for (int i = 0; i < results.size(); i++) {
+        Log.e(TAG, "updateUI: " + mMainActivity.mLiveData.getValue().size());
+            if (mMainActivity.mLiveData.getValue().size() > 0){
+                for (int i = 0; i < mMainActivity.mLiveData.getValue().size(); i++) {
                     int CurrentObject = i;
-                    RestaurantsHelper.getTodayBooking(results.get(CurrentObject).getPlaceId(), getTodayDate()).addOnCompleteListener(restaurantTask -> {
+                    RestaurantsHelper.getTodayBooking(mMainActivity.mLiveData.getValue().get(CurrentObject).getPlaceId(), getTodayDate()).addOnCompleteListener(restaurantTask -> {
                         if (restaurantTask.isSuccessful()) {
-                            Double lat = results.get(CurrentObject).getGeometry().getLocation().getLat();
-                            Double lng = results.get(CurrentObject).getGeometry().getLocation().getLng();
-                            String title = results.get(CurrentObject).getName();
+                            Double lat = mMainActivity.mLiveData.getValue().get(CurrentObject).getGeometry().getLocation().getLat();
+                            Double lng = mMainActivity.mLiveData.getValue().get(CurrentObject).getGeometry().getLocation().getLng();
+                            String title = mMainActivity.mLiveData.getValue().get(CurrentObject).getName();
 
                             MarkerOptions markerOptions = new MarkerOptions();
                             markerOptions.position(new LatLng(lat, lng));
@@ -190,23 +175,24 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.lunch_marker_someone_here));
                             }
                             Marker marker = googleMap.addMarker(markerOptions);
-                            marker.setTag(results.get(CurrentObject).getPlaceId());
+                            marker.setTag(mMainActivity.mLiveData.getValue().get(CurrentObject).getPlaceId());
                         }
                     });
                 }
             }else{
                 Toast.makeText(getContext(), getResources().getString(R.string.no_restaurant_error_message), Toast.LENGTH_SHORT).show();
             }
-        }
+        }}
 
     private void handleNewLocation(Location location) {
         Log.e(TAG, "handleNewLocation: " );
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
-        this.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
-        this.mViewModel.updateCurrentUserZoom(15);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.mViewModel.getCurrentUserPosition()));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(this.mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
+        mMainActivity.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
+        mMainActivity.mViewModel.updateCurrentUserZoom(15);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(mMainActivity.mViewModel.getCurrentUserPosition()));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMainActivity.mViewModel.getCurrentUserPosition(), mMainActivity.mViewModel.getCurrentUserZoom()));
+        updateUI();
         stopLocationUpdates();
     }
 
@@ -272,49 +258,21 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
         handleNewLocation(location);
     }
 
-    @Override
-    public void onResponse(@Nullable ResultDetails resultDetails) {
-    mResultDetails.add(resultDetails);
-    if(mResultDetails.size()==resultSize)updateUI(mResultDetails);
-    }
-
-    @Override
-    public void onResponse(@Nullable List<ResultSearch> resultSearchList) {
-    resultSize=resultSearchList.size();
-    SearchToDetails(resultSearchList);
-    }
-
-    private void SearchToDetails(List<ResultSearch> resultSearchList) {
-        mResultDetails = new ArrayList<>();
-        for (int i=0;i<resultSearchList.size();i++){
-            GooglePlaceDetailsCalls.fetchPlaceDetails(this,resultSearchList.get(i).getPlaceId());
-        }
-    }
-
-    @Override
-    public void onResponse(@Nullable AutoCompleteResult autoCompleteResult) {
-        resultSize=autoCompleteResult.getPredictions().size();
-        AutoCompleteToDetails(autoCompleteResult);
-    }
-
-    private void AutoCompleteToDetails(AutoCompleteResult autoCompleteResult) {
-        mResultDetails = new ArrayList<>();
-        for (int i=0; i<autoCompleteResult.getPredictions().size();i++){
-            GooglePlaceDetailsCalls.fetchPlaceDetails(this,autoCompleteResult.getPredictions().get(i).getPlaceId());
-        }
-    }
-
-    @Override
-    public void onFailure() {
-    }
-
     private void configureGoogleApiClient(){
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(getContext())
-                .addConnectionCallbacks(this)
-                .addApi(LocationServices.API)
-                .enableAutoManage(getActivity(), this)
-                .build();
+        if(mGoogleApiClient == null || !mGoogleApiClient.isConnected()){
+            try {
+            mGoogleApiClient = new GoogleApiClient
+                    .Builder(getContext())
+                    .addConnectionCallbacks(this)
+                    .addApi(LocationServices.API)
+                    .enableAutoManage(getActivity(), this)
+                    .build();
+    }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+            configureGoogleApiClient();
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -327,8 +285,8 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
                             mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
                                 public void onClick(View v)
                                 {
-                                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(mViewModel.getCurrentUserPosition()));
-                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getCurrentUserPosition(), mViewModel.getCurrentUserZoom()));
+                                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(mMainActivity.mViewModel.getCurrentUserPosition()));
+                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mMainActivity.mViewModel.getCurrentUserPosition(), mMainActivity.mViewModel.getCurrentUserZoom()));
                                 }
                             });
                             handleNewLocation(location);
@@ -370,7 +328,6 @@ public class MapFragment extends BaseFragment implements LocationListener, Googl
     @Override
     public void onStop() {
         super.onStop();
-        mViewModel.currentUserPosition.removeObservers(this);
     }
 
     @Override

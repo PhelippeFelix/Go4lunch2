@@ -5,7 +5,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,13 +47,10 @@ import cfwz.skiti.go4lunch.ui.MainActivity;
 import pub.devrel.easypermissions.EasyPermissions;
 
 
-public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls.Callbacks, GooglePlaceDetailsCalls.Callbacks, GoogleAutoCompleteCalls.Callbacks, LocationListener {
-    private static final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+public class ListFragment extends BaseFragment implements LocationListener {
     private RecyclerView mRecyclerView;
-    private List<ResultDetails> mResultDetailsList;
     private ListRecyclerViewAdapter mViewAdapter;
-    private MapViewModel mViewModel;
-    private int resultSize;
+    private MainActivity mainActivity;
 
 
     public static ListFragment newInstance() {
@@ -63,7 +60,7 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(MapViewModel.class);
+        mainActivity = (MainActivity)getActivity();
     }
 
     @Override
@@ -71,28 +68,15 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         Context context = view.getContext();
-        checkLocationPermission();
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getContext());
-        fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
-            if (location != null) {
-                double currentLatitude = location.getLatitude();
-                double currentLongitude = location.getLongitude();
-                mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
-            }
-        });
+        mainActivity.mLiveData.observe(getViewLifecycleOwner(),resultDetails -> configureRecyclerView() );
         mRecyclerView = (RecyclerView) view;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        mViewModel.currentUserPosition.observe(getViewLifecycleOwner(), latLng -> GooglePlaceSearch());
-
         setHasOptionsMenu(true);
         configureOnClickRecyclerView();
         return view;
     }
 
-    private void GooglePlaceSearch() {
-        GooglePlaceSearchCalls.fetchNearbyRestaurants(this, mViewModel.getCurrentUserPositionFormatted());
-    }
 
     private void configureOnClickRecyclerView() {
         ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_restaurant_object_list)
@@ -121,7 +105,8 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() > 2) {
-                    GoogleAutoCompleteSearch(query);
+                    mainActivity.GoogleAutoCompleteSearch(query);
+                    mViewAdapter.notifyDataSetChanged();
                     searchView.clearFocus();
                 } else {
                     Toast.makeText(getContext(), getResources().getString(R.string.search_too_short), Toast.LENGTH_LONG).show();
@@ -133,66 +118,15 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
             @Override
             public boolean onQueryTextChange(String query) {
                 if (query.length() > 2) {
-                    System.out.println("tictic");
-                    GoogleAutoCompleteSearch(query);
-                } else if (query.length() == 0) {
-                    System.out.println("tactac");
-                    GooglePlaceSearch();
+                    mainActivity.GoogleAutoCompleteSearch(query);
+                    mViewAdapter.notifyDataSetChanged();
+                } else if (query.length() == 0 ) {
+                    mainActivity.resetList();
+                    mViewAdapter.notifyDataSetChanged();
                 }
                 return false;
             }
         });
-    }
-
-    private void GoogleAutoCompleteSearch(String query) {
-        GoogleAutoCompleteCalls.fetchAutoCompleteResult(this, query, mViewModel.getCurrentUserPositionFormatted());
-    }
-
-    @Override
-    public void onResponse(@Nullable List<ResultSearch> resultSearchList) {
-        mResultDetailsList = new ArrayList<>();
-        resultSize = resultSearchList.size();
-        SearchToDetails(resultSearchList);
-    }
-
-    private void SearchToDetails(List<ResultSearch> resultSearchList) {
-        mResultDetailsList.clear();
-        for (int i = 0; i < resultSearchList.size(); i++) {
-            GooglePlaceDetailsCalls.fetchPlaceDetails(this, resultSearchList.get(i).getPlaceId());
-        }
-    }
-
-    private void AutoCompleteToDetails(AutoCompleteResult autoCompleteResult) {
-        System.out.println("tac");
-        mResultDetailsList.clear();
-        for (int i = 0; i < autoCompleteResult.getPredictions().size(); i++) {
-            GooglePlaceDetailsCalls.fetchPlaceDetails(this, autoCompleteResult.getPredictions().get(i).getPlaceId());
-        }
-    }
-
-    @Override
-    public void onResponse(@Nullable ResultDetails resultDetails) {
-        if (resultDetails.getTypes().contains("restaurant")){
-            System.out.println(resultSize);
-            mResultDetailsList.add(resultDetails);}
-        else {
-            resultSize--;
-        }
-        if (mResultDetailsList.size() == resultSize) {
-            System.out.println(resultSize+"SDFSDF");
-            configureRecyclerView();
-        }
-    }
-
-    @Override
-    public void onResponse(@Nullable AutoCompleteResult autoCompleteResult) {
-        resultSize = autoCompleteResult.getPredictions().size();
-        AutoCompleteToDetails(autoCompleteResult);
-    }
-
-    @Override
-    public void onFailure() {
-        Toast.makeText(getContext(), getResources().getString(R.string.no_restaurant_error_message), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -200,28 +134,12 @@ public class ListFragment extends BaseFragment implements GooglePlaceSearchCalls
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
 
-        this.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
-    }
-
-    public boolean checkLocationPermission() {
-        return EasyPermissions.hasPermissions(getContext(), perms);
+        mainActivity.mViewModel.updateCurrentUserPosition(new LatLng(currentLatitude, currentLongitude));
     }
 
     private void configureRecyclerView() {
-        this.mViewAdapter = new ListRecyclerViewAdapter(this.mResultDetailsList, mViewModel.getCurrentUserPositionFormatted());
+        this.mViewAdapter = new ListRecyclerViewAdapter(mainActivity.mLiveData.getValue(), mainActivity.mViewModel.getCurrentUserPositionFormatted());
         this.mRecyclerView.setAdapter(this.mViewAdapter);
         this.mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
     }
 }

@@ -1,12 +1,17 @@
 package cfwz.skiti.go4lunch.ui.workmates;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +35,7 @@ import cfwz.skiti.go4lunch.R;
 import cfwz.skiti.go4lunch.api.RestaurantsHelper;
 import cfwz.skiti.go4lunch.api.UserHelper;
 import cfwz.skiti.go4lunch.model.Workmate;
+import cfwz.skiti.go4lunch.ui.MainActivity;
 import cfwz.skiti.go4lunch.ui.restaurant_profile.ProfileActivity;
 import cfwz.skiti.go4lunch.ui.BaseFragment;
 import cfwz.skiti.go4lunch.utils.ItemClickSupport;
@@ -68,7 +74,6 @@ public class WorkmatesFragment extends BaseFragment {
         this.mRecyclerView.setAdapter(this.mViewAdapter);
         return view;
     }
-
 
     private void initList() {
         UserHelper.getWorkmatesCollection()
