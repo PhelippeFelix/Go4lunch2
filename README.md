@@ -7,7 +7,7 @@ Un peu avant l’heure du déjeuner, l’application notifie les différents emp
 
 Go4Lunch se repose sur le back-end Firebase proposé par Google.  
 
-les fonctionnalités de l'applications sont :  
+# Fonctionnalités
 
 La création de comptes utilisateur.  
 L’authentification des utilisateurs via des services tiers (Facebook, Twitter et Google).  
@@ -19,7 +19,7 @@ Liste des collègues (comptes utilisateurs).
 Fonctionnalité de recherche textuelle.  
 L’envoi de messages Push.  
 
-Stack technique :  
+# Stack technique
   
 Développement Android Natif Java  
 Architectures : MVC  
